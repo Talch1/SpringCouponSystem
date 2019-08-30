@@ -1,30 +1,43 @@
 package com.talch.beans;
 
-import java.util.ArrayList;
+
 import java.util.Date;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+
+
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-@Component
-@Scope("prototype")
+@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Coupon {
 
-	
+	@Id
+	@GeneratedValue
 	private long id;
+	@Column
 	private String title;
+	@Column
 	private Date startDate;
+	@Column
 	private Date endDate;
+	@Column
 	private int amount;
+	@Column
 	private CouponType type;
+	@Column
 	private String message;
+	@Column
 	private double price;
+	@Column
 	private String image;
 
 }
