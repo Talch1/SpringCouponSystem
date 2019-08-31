@@ -1,6 +1,7 @@
 package com.talch.beans;
 
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CompanyCoupon {
-	@ManyToOne
+	@OneToMany
 	private Company company;
 	@ManyToOne
 	private Coupon coupon;
