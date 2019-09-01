@@ -12,19 +12,40 @@ import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 @Table
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Customer {
+
+	private long id;
+
+	private String custName;
+
+	private String password;
+
+	private ArrayList<Coupon> coupons;
+
 	@Id
 	@GeneratedValue
-	private long id;
+	public long getId() {
+		return id;
+	}
+
 	@Column
-	private String custName;
+	public String getCustName() {
+		return custName;
+	}
+
 	@Column
-	private String password;
+	public String getPassword() {
+		return password;
+	}
+
 	@OneToMany
-	private ArrayList<Coupon> coupons;
+	public ArrayList<Coupon> getCoupons() {
+		return coupons;
+	}
 }

@@ -1,9 +1,9 @@
 package com.talch.beans;
 
-
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -11,31 +11,68 @@ import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+@Data
 @Table
 @Entity
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Coupon {
 
+	private long id;
+	private String title;
+	private Date startDate;
+	private Date endDate;
+	private int amount;
+	private CouponType type;
+	private String message;
+	private double price;
+	private String image;
+
 	@Id
 	@GeneratedValue
-	private long id;
+	public long getId() {
+		return id;
+	}
+
+	@Column(unique = true)
+	public String getTitle() {
+		return title;
+	}
+
+	@Column(columnDefinition = "Date")
+	public Date getStartDate() {
+		return startDate;
+	}
+
+	@Column(columnDefinition = "Date")
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	@Column(columnDefinition = "int")
+	public int getAmount() {
+		return amount;
+	}
+
+	@Enumerated
 	@Column
-	private String title;
+	public CouponType getType() {
+		return type;
+	}
+
 	@Column
-	private Date startDate;
+	public String getMessage() {
+		return message;
+	}
+
+	@Column(columnDefinition = "double")
+	public double getPrice() {
+		return price;
+	}
+
 	@Column
-	private Date endDate;
-	@Column
-	private int amount;
-	@Column
-	private CouponType type;
-	@Column
-	private String message;
-	@Column
-	private double price;
-	@Column
-	private String image;
+	public String getImage() {
+		return image;
+	}
 
 }

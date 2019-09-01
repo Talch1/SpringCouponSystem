@@ -7,7 +7,7 @@ import com.talch.beans.CouponType;
 
 public interface CouponRepository extends JpaRepository<Coupon, Long>{
 
-	Iterable<Coupon> findByOne(CouponType type);
+
 
 
 

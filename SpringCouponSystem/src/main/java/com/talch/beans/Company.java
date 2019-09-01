@@ -19,15 +19,41 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Company {
+
+	private long id;
+
+	private String compName;
+
+	private String password;
+
+	private String email;
+
+	private ArrayList<Coupon> cupons;
+
 	@Id
 	@GeneratedValue
-	private long id;
-@Column
-	private String compName;
-@Column
-	private String password;
-@Column
-	private String email;
-@OneToMany
-	private ArrayList<Coupon> cupons;
+	public long getId() {
+		return id;
+	}
+
+	@Column
+	public String getCompName() {
+		return compName;
+	}
+
+	@Column
+	public String getPassword() {
+		return password;
+	}
+
+	@Column
+	public String getEmail() {
+		return email;
+	}
+
+	@OneToMany
+	public ArrayList<Coupon> getCupons() {
+		return cupons;
+	}
+
 }
