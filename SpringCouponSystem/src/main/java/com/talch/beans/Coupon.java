@@ -5,22 +5,25 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-@Data
+
 @Table
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
 public class Coupon {
 
 	private long id;
 	private String title;
+	@Autowired
 	private Date startDate;
+	@Autowired
 	private Date endDate;
 	private int amount;
 	private CouponType type;
@@ -28,8 +31,29 @@ public class Coupon {
 	private double price;
 	private String image;
 
+	
+	
+	public Coupon(long id, String title, Date startDate, Date endDate, int amount, CouponType type, String message,
+			double price, String image) {
+		setId(id);
+		setTitle(title);
+		setStartDate(startDate);
+		setEndDate(endDate);
+		setAmount(amount);
+		setType(type);
+		setMessage(message);
+		setPrice(price);
+		setImage(image);
+	}
+
+	
+	public Coupon() {
+		
+	}
+
+
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	public long getId() {
 		return id;
 	}
@@ -55,9 +79,44 @@ public class Coupon {
 	}
 
 	@Enumerated
-	@Column
 	public CouponType getType() {
 		return type;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+
+	public void setAmount(int amount) {
+		this.amount = amount;
+	}
+
+	public void setType(CouponType type) {
+		this.type = type;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
 	}
 
 	@Column
@@ -74,5 +133,15 @@ public class Coupon {
 	public String getImage() {
 		return image;
 	}
+
+
+	@Override
+	public String toString() {
+		return "Coupon [id=" + id + ", title=" + title + ", startDate=" + startDate + ", endDate=" + endDate
+				+ ", amount=" + amount + ", type=" + type + ", message=" + message + ", price=" + price + ", image="
+				+ image + "]";
+	}
+	
+	
 
 }
