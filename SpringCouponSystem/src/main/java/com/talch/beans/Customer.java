@@ -1,22 +1,24 @@
 package com.talch.beans;
 
-import java.util.ArrayList;
+import java.util.Collection;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Table
 @Entity
+@AllArgsConstructor
+@Data
+@NoArgsConstructor
 public class Customer {
 
 	private long id;
@@ -24,23 +26,9 @@ public class Customer {
 	private String custName;
 
 	private String password;
+	
 	@Autowired
-	private ArrayList<Coupon> coupons;
-
-	
-	
-	public Customer(long id, String custName, String password, ArrayList<Coupon> coupons) {
-		setId(id);
-	    setCustName(custName);
-		setPassword(password);
-		setCoupons(coupons);
-	}
-	
-
-	public Customer() {
-		
-	}
-
+	private Collection<Coupon> cupons;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -48,25 +36,9 @@ public class Customer {
 		return id;
 	}
 
-	
-	public ArrayList<Coupon> getCoupons() {
-		return coupons;
-	}
-
-	public void setCoupons(ArrayList<Coupon> coupons) {
-		this.coupons = coupons;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public void setCustName(String custName) {
-		this.custName = custName;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
+	@OneToMany
+	public Collection<Coupon> getCupons() {
+		return cupons;
 	}
 
 	@Column
@@ -78,13 +50,5 @@ public class Customer {
 	public String getPassword() {
 		return password;
 	}
-
-	@Override
-	public String toString() {
-		return "Customer [id=" + id + ", custName=" + custName + ", password=" + password + ", coupons=" + coupons
-				+ "]";
-	}
-	
-	
 
 }

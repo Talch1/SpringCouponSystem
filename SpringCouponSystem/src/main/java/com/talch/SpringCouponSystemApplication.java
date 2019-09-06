@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class SpringCouponSystemApplication {
 
 	public static void main(String[] args) {
-		ConfigurableApplicationContext ctxAnnotationConfigApplicationContext = SpringApplication.run(SpringCouponSystemApplication.class, args);
+		ConfigurableApplicationContext ctx = SpringApplication.run(SpringCouponSystemApplication.class, args);
 		 System.out.println("GO!");
 	}
 
