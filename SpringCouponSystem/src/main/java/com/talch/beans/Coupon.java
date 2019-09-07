@@ -10,6 +10,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -47,12 +49,12 @@ public class Coupon {
 		return title;
 	}
 
-	@Column(columnDefinition = "Date")
+	@Temporal(TemporalType.DATE)
 	public Date getStartDate() {
 		return startDate;
 	}
 
-	@Column(columnDefinition = "Date")
+	@Temporal(TemporalType.DATE)
 	public Date getEndDate() {
 		return endDate;
 	}

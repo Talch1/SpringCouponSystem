@@ -61,7 +61,7 @@ public class AdminService {
 
 		companyRepostory.saveAll(comp);
 
-		companyRepostory.saveAll(comp);
+		
 
 		List<Customer> cust = new ArrayList<>();
 
