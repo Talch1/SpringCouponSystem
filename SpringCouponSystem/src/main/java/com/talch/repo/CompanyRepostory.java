@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.talch.beans.Company;
-import com.talch.beans.Coupon;
+
 
 @Repository
 public interface CompanyRepostory extends JpaRepository<Company, Long> {
@@ -16,6 +16,7 @@ public interface CompanyRepostory extends JpaRepository<Company, Long> {
 	
 	List<Company> findAll();
 
-	//List<Company> findAllByCoupon(Coupon coupons);
+
+	// get all coupons of this company
 
 }

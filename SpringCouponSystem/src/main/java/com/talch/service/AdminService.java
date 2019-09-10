@@ -3,10 +3,14 @@ package com.talch.service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+
 import com.talch.beans.Company;
 import com.talch.beans.Coupon;
 import com.talch.beans.CouponType;
@@ -61,8 +65,6 @@ public class AdminService {
 
 		companyRepostory.saveAll(comp);
 
-		
-
 		List<Customer> cust = new ArrayList<>();
 
 		cust.add(new Customer(2010, "Gabi", "12345", null));
@@ -70,13 +72,131 @@ public class AdminService {
 
 		customerRepository.saveAll(cust);
 	}
+//**************************Company************************************
 
-//
-//	public List<Coupon> findAllWhereEndDateAfterDate(Date date) {
-//		ArrayList<Coupon> list= new ArrayList<Coupon>();
-//		for (Coupon coupon : list) {
-//				 couponRepository.delete(coupon);
-//		}
-//		return couponRepository.findAll();
-//	}
+	public List<Company> insertCompany(Company company) {
+		companyRepostory.save(company);
+		return companyRepostory.findAll();
+	}
+
+	public List<Company> deleteCompanyfromCompany(Long id) {
+		companyRepostory.deleteById(id);
+		return companyRepostory.findAll();
+
+	}
+
+	public String deleteCompanys() {
+		companyRepostory.deleteAll();
+		return "All Customers Deleted ";
+	}
+
+	public Optional<Company> findById1(Long id) {
+		return companyRepostory.findById(id);
+	}
+
+	public List<Company> findAllCom() {
+		return companyRepostory.findAll();
+	}
+
+	public Company updateCompany(Long id, Company company) {
+		Company compToUpdate = companyRepostory.getOne(id);
+		compToUpdate.setCompName(company.getCompName());
+		compToUpdate.setEmail(company.getEmail());
+		compToUpdate.setPassword(company.getPassword());
+		companyRepostory.save(compToUpdate);
+		return compToUpdate;
+
+	}
+	// **************************Customer************************************
+
+	public List<Customer> deleteCustomer(Long id) {
+		customerRepository.deleteById(id);
+		return customerRepository.findAll();
+	}
+
+	public String deleteCustomers() {
+		customerRepository.deleteAll();
+		return "All Customers Deleted ";
+	}
+
+	public Optional<Customer> findById(Long id) {
+		return customerRepository.findById(id);
+	}
+
+	public List<Customer> findAllCust() {
+		return customerRepository.findAll();
+	}
+
+	public List<Customer> insertCust(Customer customer) {
+		customerRepository.save(customer);
+		return customerRepository.findAll();
+	}
+
+	public Customer updateCustomer(Long id, Customer customer) {
+		Customer custToUpdate = customerRepository.getOne(id);
+		custToUpdate.setCustName(customer.getCustName());
+		custToUpdate.setPassword(customer.getPassword());
+		customerRepository.save(custToUpdate);
+		return custToUpdate;
+
+	}
+
+	// **************************CouponS************************************
+
+	public List<Coupon> addCoupon(Coupon coupon) {
+		couponRepository.save(coupon);
+		return couponRepository.findAll();
+	}
+
+	public List<Coupon> deleteCoupon(Long id) {
+		couponRepository.deleteById(id);
+		return couponRepository.findAll();
+	}
+
+	public Coupon updateCoupon(Long id, Coupon coupon) {
+		Coupon coupToUpdate = couponRepository.getOne(id);
+		coupToUpdate.setEndDate(coupon.getEndDate());
+
+		coupToUpdate.setPrice(coupon.getPrice());
+		couponRepository.save(coupToUpdate);
+
+		return coupToUpdate;
+
+	}
+
+	public String deleteCoupons() {
+		couponRepository.deleteAll();
+		return "All Customers Deleted ";
+	}
+
+	public Optional<Coupon> findCoupById(Long id) {
+		return couponRepository.findById(id);
+	}
+
+	public List<Coupon> findAllCoup() {
+		return couponRepository.findAll();
+	}
+
+	public List<Coupon> getCouponByType(CouponType type) {
+		return couponRepository.getCouponByType(type);
+	}
+
+	public List<Coupon> getCouponByDate(Date date) {
+		List<Coupon> coupons = couponRepository.findAll();
+		for (Coupon coupon : coupons) {
+			if ((coupon.getEndDate()).before(date)) {
+				coupons.remove(coupon.getId());
+			}
+		}
+		return coupons;
+
+	}
+
+	public List<Coupon> getCouponWhenPriceBetwenPrice(Double price1) {
+		return couponRepository.getCouponWhenPriceSmallerPrice1(price1);
+		
+		
+
+	}
+
 }
