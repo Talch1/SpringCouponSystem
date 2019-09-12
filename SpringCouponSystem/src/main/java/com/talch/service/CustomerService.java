@@ -7,6 +7,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.talch.beans.Coupon;
 import com.talch.beans.Customer;
 import com.talch.repo.CustomerRepository;
 
@@ -51,5 +52,9 @@ public class CustomerService {
 
 	}
 
-	
+//	public List<Coupon> getCoupons(long id){
+//		return customerRepository.getCoupons(id);
+//		
+//	}
+//	
 	}

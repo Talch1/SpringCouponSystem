@@ -1,7 +1,7 @@
 package com.talch.service;
 
+import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,7 +9,6 @@ import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import com.talch.beans.Company;
 import com.talch.beans.Coupon;
@@ -178,22 +177,18 @@ public class AdminService {
 	}
 
 	public List<Coupon> getCouponByType(CouponType type) {
-		return couponRepository.getCouponByType(type);
+		return couponRepository.findByType(type);
 	}
 
 	public List<Coupon> getCouponByDate(Date date) {
-		List<Coupon> coupons = couponRepository.findAll();
-		for (Coupon coupon : coupons) {
-			if ((coupon.getEndDate()).before(date)) {
-				coupons.remove(coupon.getId());
-			}
-		}
-		return coupons;
+		
+	
+		return couponRepository.findByEndDateBefore(date);
 
 	}
 
 	public List<Coupon> getCouponWhenPriceBetwenPrice(Double price1) {
-		return couponRepository.getCouponWhenPriceSmallerPrice1(price1);
+		return couponRepository.findByPriceLessThan(price1);
 		
 		
 

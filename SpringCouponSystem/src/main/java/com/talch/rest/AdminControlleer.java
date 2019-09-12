@@ -1,6 +1,7 @@
 package com.talch.rest;
 
-import java.util.Date;
+
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,20 +64,20 @@ public class AdminControlleer {
 		return adminService.deleteCustomers();
 
 	}
-	// http://localhost:8080/admin/companyUpdate
-	@PutMapping(value = "/companyUpdate")
-	public Company updateCompany1(@RequestParam Long id, @RequestBody Company company) {
-		adminService.updateCompany(id, company);
-		return company;
+	
+	// http://localhost:8080/admin/custUpdate
+	@PutMapping(value = "/custUpdate/{id}")
+	public Customer updateCustomer1(@PathVariable Long id, @RequestBody Customer customer) {
+		adminService.updateCustomer(id, customer);
+		return customer;
 	}
-
 	// ***********************Company***************************************
 
-	// http://localhost:8080/admin/compCreate
+	// http://localhost:8080/admin/compnyCreate
 	@PostMapping(value = "/compnyCreate")
-	public List<Customer> insertCompany(@RequestBody Company company) {
+	public List<Company> insertCompany(@RequestBody Company company) {
 		adminService.insertCompany(company);
-		return adminService.findAllCust();
+		return adminService.insertCompany(company);
 
 	}
 
@@ -105,13 +106,13 @@ public class AdminControlleer {
 		adminService.deleteCompanys();
 		return "All Companyes deleted";
 	}
-	
-	// http://localhost:8080/admin/custUpdate
-		@PutMapping(value = "/custUpdate")
-		public Customer updateCustomer1(@RequestParam Long id, @RequestBody Customer customer) {
-			adminService.updateCustomer(id, customer);
-			return customer;
+	// http://localhost:8080/admin/companyUpdate
+		@PutMapping(value = "/companyUpdate/{id}")
+		public List<Company> updateCompany1(@PathVariable Long id, @RequestBody Company company) {
+			adminService.updateCompany(id, company);
+			return adminService.findAllCom();
 		}
+
 	// ***********************Coupon*****************************************
 
 		// http://localhost:8080/admin/createCoup
@@ -148,8 +149,8 @@ public class AdminControlleer {
 		}
 		
 		// http://localhost:8080/admin/coupUpdate
-			@PutMapping(value = "/coupUpdate")
-			public Coupon updateCoupon(@RequestParam Long id, @RequestBody Coupon coupon) {
+			@PutMapping(value = "/coupUpdate/{id}")
+			public Coupon updateCoupon(@PathVariable Long id, @RequestBody Coupon coupon) {
 			
 				adminService.updateCoupon(id, coupon);
 			
@@ -157,20 +158,21 @@ public class AdminControlleer {
 				
 			}
 			// http://localhost:8080/admin/getAllCoupByType
-			@GetMapping(value = "/getAllCoupByType")
-			public List<Coupon> getAllCouponsByType(@RequestBody CouponType type){
+			@GetMapping(value = "/getAllCoupByType/{type}")
+			
+			public List<Coupon> getAllCouponsByType(@PathVariable CouponType type){
 				return adminService.getCouponByType(type);
 				
 			}
 			
-			// http://localhost:8080/admin/getAllByDate
-			@GetMapping(value = "/getAllCoupByDate")
-			public List<Coupon> getAllCouponsByDate(@RequestBody Date date){
+			// http://localhost:8080/admin/getAllCoupByDate
+			@GetMapping(value = "/getAllCoupByDate/{date}")
+			public List<Coupon> getAllCouponsByDate(@PathVariable Date date){
 				return adminService.getCouponByDate(date);
 				
 			}
-			// http://localhost:8080/admin/getAllByPrice
-			@GetMapping(value = "/getAllCoupByPrice")
+			// http://localhost:8080/admin/getAllCoupByPrice
+			@GetMapping(value = "/getAllCoupByPrice/{price1}")
 			public List<Coupon> getCouponWhenPriceBetwenPrice(@PathVariable Double price1) {
 				return adminService.getCouponWhenPriceBetwenPrice(price1);
 			}

@@ -1,6 +1,7 @@
 package com.talch.repo;
 
-import java.util.Date;
+
+import java.sql.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,10 +14,10 @@ import com.talch.beans.CouponType;
 public interface CouponRepository extends JpaRepository<Coupon, Long>{
 
 	
-	public  List<Coupon> getCouponByType(CouponType type) ;
+	public  List<Coupon> findByType(CouponType type) ;
 	
-	public List<Coupon> getCouponWhenPriceSmallerPrice1(Double price1);
+	public List<Coupon> findByPriceLessThan(Double price1);
 	
-	public  List<Coupon> getCouponByDate(Date date) ;
+	public  List<Coupon> findByEndDateBefore(Date date) ;
 
 }

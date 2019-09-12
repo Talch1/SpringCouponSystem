@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.talch.beans.Company;
+import com.talch.beans.Coupon;
 import com.talch.beans.Customer;
 import com.talch.service.CustomerService;
 
@@ -58,10 +59,17 @@ public class CustomerController {
 	}
 
 	// http://localhost:8080/customer/updateCustomer
-	@PutMapping(value = "/updateCustomer")
-	public Customer updateCustomer(@RequestParam Long id, @RequestBody Customer customer) {
+	@PutMapping(value = "/updateCustomer/{id}")
+	public Customer updateCustomer(@PathVariable Long id, @RequestBody Customer customer) {
 		customerService.updateCustomer(id, customer);
 		return customer;
 	}
 
+	
+//	// http://localhost:8080/customer/getCoupons
+//	@GetMapping(value = "/getCoupons")
+//	public List<Coupon> getCoupons(@PathVariable long id){
+//		return customerService.getCoupons(id);
+//	}
+	
 }
