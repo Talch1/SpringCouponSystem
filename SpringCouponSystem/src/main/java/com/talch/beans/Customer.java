@@ -4,8 +4,6 @@ import java.util.Collection;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
@@ -26,12 +24,11 @@ public class Customer {
 	private String custName;
 
 	private String password;
-	
+
 	@Autowired
 	private Collection<Coupon> cupons;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
 	public long getId() {
 		return id;
 	}
@@ -41,7 +38,7 @@ public class Customer {
 		return cupons;
 	}
 
-	@Column
+	@Column(unique = true)
 	public String getCustName() {
 		return custName;
 	}

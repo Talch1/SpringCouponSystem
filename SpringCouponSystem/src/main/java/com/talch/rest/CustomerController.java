@@ -11,10 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.talch.beans.Company;
 import com.talch.beans.Coupon;
 import com.talch.beans.Customer;
 import com.talch.service.CustomerService;
@@ -65,11 +62,11 @@ public class CustomerController {
 		return customer;
 	}
 
-	
-//	// http://localhost:8080/customer/getCoupons
-//	@GetMapping(value = "/getCoupons")
-//	public List<Coupon> getCoupons(@PathVariable long id){
-//		return customerService.getCoupons(id);
-//	}
-	
+	// http://localhost:8080/customer/addCouponToCust
+	@PutMapping(value = "/addCouponToCust/{id}")
+	public String addCompany(@PathVariable Long id, @RequestBody List<Coupon> coupons) {
+		customerService.purchoiseCoupon(id, coupons);
+		return "Coupons Added";
+	}
+
 }

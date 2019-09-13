@@ -1,7 +1,7 @@
 package com.talch.rest;
 
-
 import java.sql.Date;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.talch.beans.Company;
@@ -64,12 +63,26 @@ public class AdminControlleer {
 		return adminService.deleteCustomers();
 
 	}
-	
+
 	// http://localhost:8080/admin/custUpdate
 	@PutMapping(value = "/custUpdate/{id}")
 	public Customer updateCustomer1(@PathVariable Long id, @RequestBody Customer customer) {
 		adminService.updateCustomer(id, customer);
 		return customer;
+	}
+
+	// http://localhost:8080/admin/addCouponToCust
+	@PutMapping(value = "/addCouponToCust/{id}")
+	public String addCoupon(@PathVariable Long id, @RequestBody List<Coupon> coupons) {
+		adminService.purchoiseCoupon(id, coupons);
+		return "Coupons Added";
+	}
+
+	// http://localhost:8080/admin/getCustCoupons
+	@GetMapping(value = "/getCompCoupons/{id}")
+	public Collection<Coupon> getCustCoupons(@PathVariable Long id) {
+		return adminService.getAllcouponsByCustId(id);
+
 	}
 	// ***********************Company***************************************
 
@@ -84,7 +97,7 @@ public class AdminControlleer {
 	// http://localhost:8080/admin/getByID/{id}
 	@GetMapping(value = "/getCompByID/{id}")
 	Optional<Company> findById1(@PathVariable Long id) {
-		return adminService.findById1(id);
+		return adminService.geCompany(id);
 	}
 
 	// http://localhost:8080/admin/getCompanys
@@ -106,74 +119,90 @@ public class AdminControlleer {
 		adminService.deleteCompanys();
 		return "All Companyes deleted";
 	}
+
 	// http://localhost:8080/admin/companyUpdate
-		@PutMapping(value = "/companyUpdate/{id}")
-		public List<Company> updateCompany1(@PathVariable Long id, @RequestBody Company company) {
-			adminService.updateCompany(id, company);
-			return adminService.findAllCom();
-		}
+	@PutMapping(value = "/companyUpdate/{id}")
+	public List<Company> updateCompany1(@PathVariable Long id, @RequestBody Company company) {
+		adminService.updateCompany(id, company);
+		return adminService.findAllCom();
+	}
+
+	// http://localhost:8080/admin/addCouponToComp
+	@PutMapping(value = "/addCouponToComp/{id}")
+	public String addCompany(@PathVariable Long id, @RequestBody List<Coupon> coupons) {
+		adminService.addCoupons(id, coupons);
+		return "Coupons Added";
+	}
+
+	// http://localhost:8080/admin/getCompCoupons
+	@GetMapping(value = "/getCompCoupons/{id}")
+	public Collection<Coupon> getCompCoupons(@PathVariable Long id) {
+		return adminService.getAllcouponsByCompId(id);
+
+	}
 
 	// ***********************Coupon*****************************************
 
-		// http://localhost:8080/admin/createCoup
-		@PostMapping(value = "/createCoup")
-		public List<Coupon> insertCoup(@RequestBody Coupon coup) {
-			adminService.addCoupon(coup);
-			return adminService.findAllCoup();
+	// http://localhost:8080/admin/createCoup
+	@PostMapping(value = "/createCoup")
+	public List<Coupon> insertCoup(@RequestBody Coupon coup) {
+		adminService.addCoupon(coup);
+		return adminService.findAllCoup();
 
-		}
+	}
 
-		// http://localhost:8080/admin/getCoupByID/{id}
-		@GetMapping(value = "/getCoupByID/{id}")
-		Optional<Coupon> findById2(@PathVariable Long id) {
-			return adminService.findCoupById(id);
-		}
+	// http://localhost:8080/admin/getCoupByID/{id}
+	@GetMapping(value = "/getCoupByID/{id}")
+	Optional<Coupon> findById2(@PathVariable Long id) {
+		return adminService.findCoupById(id);
+	}
 
-		// http://localhost:8080/admin/getCoupons
-		@GetMapping(value = "/getCoupons")
-		public List<Coupon> getAllCoupons() {
-			return adminService.findAllCoup();
-		}
+	// http://localhost:8080/admin/getCoupons
+	@GetMapping(value = "/getCoupons")
+	public List<Coupon> getAllCoupons() {
+		return adminService.findAllCoup();
+	}
 
-		// http://localhost:8080/admin/deleteCoup/{id}
-		@DeleteMapping(value = "/deleteCoup/{id}")
-		public List<Coupon> deleteCoup(@PathVariable Long id) {
-			return adminService.deleteCoupon(id);
-		}
+	// http://localhost:8080/admin/deleteCoup/{id}
+	@DeleteMapping(value = "/deleteCoup/{id}")
+	public List<Coupon> deleteCoup(@PathVariable Long id) {
+		return adminService.deleteCoupon(id);
+	}
 
-		// http://localhost:8080/admin/deleteCoup/All
-		@DeleteMapping(value = "/deleteCoup/All")
-		public String deleteCoupons() {
-			adminService.deleteCoupons();
-			return "All Companyes deleted";
-		}
-		
-		// http://localhost:8080/admin/coupUpdate
-			@PutMapping(value = "/coupUpdate/{id}")
-			public Coupon updateCoupon(@PathVariable Long id, @RequestBody Coupon coupon) {
-			
-				adminService.updateCoupon(id, coupon);
-			
-				return coupon;
-				
-			}
-			// http://localhost:8080/admin/getAllCoupByType
-			@GetMapping(value = "/getAllCoupByType/{type}")
-			
-			public List<Coupon> getAllCouponsByType(@PathVariable CouponType type){
-				return adminService.getCouponByType(type);
-				
-			}
-			
-			// http://localhost:8080/admin/getAllCoupByDate
-			@GetMapping(value = "/getAllCoupByDate/{date}")
-			public List<Coupon> getAllCouponsByDate(@PathVariable Date date){
-				return adminService.getCouponByDate(date);
-				
-			}
-			// http://localhost:8080/admin/getAllCoupByPrice
-			@GetMapping(value = "/getAllCoupByPrice/{price1}")
-			public List<Coupon> getCouponWhenPriceBetwenPrice(@PathVariable Double price1) {
-				return adminService.getCouponWhenPriceBetwenPrice(price1);
-			}
+	// http://localhost:8080/admin/deleteCoup/All
+	@DeleteMapping(value = "/deleteCoup/All")
+	public String deleteCoupons() {
+		adminService.deleteCoupons();
+		return "All Companyes deleted";
+	}
+
+	// http://localhost:8080/admin/coupUpdate
+	@PutMapping(value = "/coupUpdate/{id}")
+	public Coupon updateCoupon(@PathVariable Long id, @RequestBody Coupon coupon) {
+		adminService.updateCoupon(id, coupon);
+
+		return coupon;
+
+	}
+
+	// http://localhost:8080/admin/getAllCoupByType
+	@GetMapping(value = "/getAllCoupByType/{type}")
+
+	public List<Coupon> getAllCouponsByType(@PathVariable CouponType type) {
+		return adminService.getCouponByType(type);
+
+	}
+
+	// http://localhost:8080/admin/getAllCoupByDate
+	@GetMapping(value = "/getAllCoupByDate/{date}")
+	public List<Coupon> getAllCouponsByDate(@PathVariable Date date) {
+		return adminService.getCouponByDate(date);
+
+	}
+
+	// http://localhost:8080/admin/getAllCoupByPrice
+	@GetMapping(value = "/getAllCoupByPrice/{price1}")
+	public List<Coupon> getCouponWhenPriceBetwenPrice(@PathVariable Double price1) {
+		return adminService.getCouponWhenPriceBetwenPrice(price1);
+	}
 }

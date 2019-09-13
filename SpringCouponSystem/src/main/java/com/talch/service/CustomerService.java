@@ -1,10 +1,12 @@
 package com.talch.service;
 
 import java.util.List;
+
 import java.util.Optional;
 
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import com.talch.beans.Coupon;
@@ -18,22 +20,20 @@ public class CustomerService {
 	@Autowired
 	CustomerRepository customerRepository;
 
-
 	public List<Customer> insertCustomer(Customer customer) {
-		 customerRepository.save(customer);
-		 return customerRepository.findAll();
+		customerRepository.save(customer);
+		return customerRepository.findAll();
 	}
 
 	public List<Customer> deleteCustomer(Long id) {
 		customerRepository.deleteById(id);
 		return findAll();
 	}
-	
+
 	public String deleteCustomers() {
 		customerRepository.deleteAll();
 		return "All Customers Deleted ";
 	}
-
 
 	public Optional<Customer> findById(Long id) {
 		return customerRepository.findById(id);
@@ -42,7 +42,7 @@ public class CustomerService {
 	public List<Customer> findAll() {
 		return customerRepository.findAll();
 	}
-	
+
 	public Customer updateCustomer(Long id, Customer customer) {
 		Customer custToUpdate = customerRepository.getOne(id);
 		custToUpdate.setCustName(customer.getCustName());
@@ -52,9 +52,11 @@ public class CustomerService {
 
 	}
 
-//	public List<Coupon> getCoupons(long id){
-//		return customerRepository.getCoupons(id);
-//		
-//	}
-//	
+	public void purchoiseCoupon(Long id, List<Coupon> coupons) {
+		Customer compToUpdate = customerRepository.getOne(id);
+		compToUpdate.setCupons(coupons);
+		customerRepository.save(compToUpdate);
+
 	}
+
+}

@@ -2,6 +2,7 @@ package com.talch.service;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,7 +90,7 @@ public class AdminService {
 		return "All Customers Deleted ";
 	}
 
-	public Optional<Company> findById1(Long id) {
+	public Optional<Company> geCompany(Long id) {
 		return companyRepostory.findById(id);
 	}
 
@@ -104,6 +105,20 @@ public class AdminService {
 		compToUpdate.setPassword(company.getPassword());
 		companyRepostory.save(compToUpdate);
 		return compToUpdate;
+
+	}
+
+	public void addCoupons(long id, List<Coupon> coupons) {
+		Company compToUpdate = companyRepostory.getOne(id);
+		compToUpdate.setCupons(coupons);
+		companyRepostory.save(compToUpdate);
+
+	}
+
+	public Collection<Coupon> getAllcouponsByCompId(long id) {
+		Optional<Company> company = companyRepostory.findById(id);
+		List<Coupon> coupons = (List<Coupon>) company.get().getCupons();
+		return coupons;
 
 	}
 	// **************************Customer************************************
@@ -140,6 +155,19 @@ public class AdminService {
 
 	}
 
+	public void purchoiseCoupon(Long id, List<Coupon> coupons) {
+		Customer compToUpdate = customerRepository.getOne(id);
+		compToUpdate.setCupons(coupons);
+		customerRepository.save(compToUpdate);
+
+	}
+
+	public Collection<Coupon> getAllcouponsByCustId(long id) {
+		Optional<Customer> cust = customerRepository.findById(id);
+		List<Coupon> coupons = (List<Coupon>) cust.get().getCupons();
+		return coupons;
+
+	}
 	// **************************CouponS************************************
 
 	public List<Coupon> addCoupon(Coupon coupon) {
@@ -181,16 +209,13 @@ public class AdminService {
 	}
 
 	public List<Coupon> getCouponByDate(Date date) {
-		
-	
+
 		return couponRepository.findByEndDateBefore(date);
 
 	}
 
 	public List<Coupon> getCouponWhenPriceBetwenPrice(Double price1) {
 		return couponRepository.findByPriceLessThan(price1);
-		
-		
 
 	}
 
