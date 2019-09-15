@@ -22,7 +22,7 @@ public class CompanyService {
 
 	@Autowired
 	CompanyRepostory companyRepostory;
-	@Autowired 
+	@Autowired
 	CouponRepository couponRepository;
 
 	public Company addCompanyToCompany(Company company) {
@@ -69,8 +69,7 @@ public class CompanyService {
 		companyRepostory.save(compToUpdate);
 
 	}
-	
-	
+
 	public List<Coupon> addCoupon(Coupon coupon) {
 		couponRepository.save(coupon);
 		return couponRepository.findAll();
@@ -119,44 +118,15 @@ public class CompanyService {
 		return couponRepository.findByPriceLessThan(price1);
 
 	}
-//	
-//	public boolean login(String compname, String pass) {
-//		Company company = new Company();
-//		
-//		
-//
-//		String sql = "SELECT * FROM company WHERE COMPNAME = ? and  password = ?";
-//
-//		PreparedStatement preparedStatement = null;
-//
-//		try {
-//
-//			preparedStatement = connection.prepareStatement(sql);
-//			preparedStatement.setString(1, compname);
-//			preparedStatement.setString(2, pass);
-//			ResultSet rs = preparedStatement.executeQuery();
-//
-//			while (rs.next()) {
-//
-//				company.setId(rs.getLong(1));
-//				company.setCompName(rs.getString(2));
-//				company.setPassword(rs.getString(3));
-//
-//			}
-//		} catch (SQLException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} finally {
-//
-//			ConnectionPool.getInstance().returnConnection(connection);
-//		}
-//
-//		if (company.getId() == 0) {
-//			return false;
-//		} else
-//			return true;
-//	}
-//
-//}
-//
+
+	public boolean loggin(String compName, String password) {
+
+		if (companyRepostory.existsById((companyRepostory.findByCompNameAndPassword(compName, password).getId()))) {
+			return true;
+
+		} else {
+			return false;
+		}
+
+	}
 }

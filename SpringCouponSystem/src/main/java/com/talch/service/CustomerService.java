@@ -59,4 +59,14 @@ public class CustomerService {
 
 	}
 
+	public boolean loggin(String custName, String password) {
+
+		if (customerRepository.existsById(customerRepository.findByCustNameAndPassword(custName, password).getId())) {
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
 }

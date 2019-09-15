@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.talch.CouponSystem;
 import com.talch.beans.ClientType;
@@ -14,6 +15,11 @@ import com.talch.beans.Customer;
 import com.talch.exeption.LogginEx;
 import com.talch.service.AdminService;
 
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+@Component
+@NoArgsConstructor
+@ToString
 public class AdminFacade implements CouponClientFacade {
 
 	@Autowired

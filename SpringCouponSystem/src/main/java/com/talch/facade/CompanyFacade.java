@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.talch.beans.ClientType;
 import com.talch.beans.Company;
@@ -16,11 +17,14 @@ import com.talch.exeption.LogginEx;
 import com.talch.repo.CouponRepository;
 import com.talch.service.CompanyService;
 
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+@Component
+@NoArgsConstructor
+@ToString
 public class CompanyFacade implements CouponClientFacade {
 	@Autowired
 	CompanyService companyService;
-
-	
 
 	public void createCompany(Company company) {
 		companyService.insertComp(company);
@@ -66,62 +70,50 @@ public class CompanyFacade implements CouponClientFacade {
 		companyService.deleteCoupons();
 	}
 
-	
-	public Coupon updateCoupon(Coupon coupon,long id)  {
+	public Coupon updateCoupon(Coupon coupon, long id) {
 		return companyService.updateCoupon(id, coupon);
 	}
 
-	
 	public Optional<Coupon> getCoupon(long id) {
 		return companyService.findCoupById(id);
 	}
 
-	
-	public List<Coupon> getAllCoupons(){
+	public List<Coupon> getAllCoupons() {
 		return companyService.findAllCoup();
 	}
-	
-	public List<Coupon> getAllCouponsByComp(Company company){
+
+	public List<Coupon> getAllCouponsByComp(Company company) {
 		Optional<Company> company1 = companyService.findById(company.getId());
 		List<Coupon> coupons = (List<Coupon>) company1.get().getCupons();
 		return coupons;
 	}
-	
 
-	
-	public List<Coupon> getCouponByType(CouponType type){
+	public List<Coupon> getCouponByType(CouponType type) {
 		return companyService.getCouponByType(type);
 
 	}
 
-	
-	public List<Coupon> getCouponByPrice(double price){
-	return companyService.getCouponWhenPriceBetwenPrice(price);
+	public List<Coupon> getCouponByPrice(double price) {
+		return companyService.getCouponWhenPriceBetwenPrice(price);
 	}
 
+	public List<Coupon> getCouponBeforeDate(Date date) {
+		return companyService.getCouponByDate(date);
+
+	}
+
+	public CouponClientFacade login(String name, String password, ClientType c)throws  LogginEx {
 	
-	public List<Coupon> getCouponBeforeDate(Date date){
-			return companyService.getCouponByDate(date);
+		if (companyService.loggin(name, password)==true && (c== ClientType.Company)) {
 			
+    	CompanyFacade companyFacade = new CompanyFacade();
+     	return companyFacade;
+		}else {
+				throw new LogginEx("Invalid email or password");
 
+}
+		
 	}
 
-	
-	public CouponClientFacade login(String name, String password, ClientType c) {
-		return null;
-//			throws  LogginEx, {
-//		
-//		{
-//			if (companyDBDAO.login(name, password)) {
-//				CompanyFacade companyFacade = new CompanyFacade();
-//				return companyFacade;
-//			} else {
-//				throw new LogginEx("Invalid email or password");
-//			}
-//
-//		}
-//	}
-//
-}
 
 }

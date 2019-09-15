@@ -79,7 +79,7 @@ public class AdminControlleer {
 	}
 
 	// http://localhost:8080/admin/getCustCoupons
-	@GetMapping(value = "/getCompCoupons/{id}")
+	@GetMapping(value = "/getCompCouponsById/{id}")
 	public Collection<Coupon> getCustCoupons(@PathVariable Long id) {
 		return adminService.getAllcouponsByCustId(id);
 
