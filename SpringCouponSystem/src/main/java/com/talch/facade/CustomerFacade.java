@@ -1,11 +1,7 @@
 package com.talch.facade;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import javax.management.NotificationEmitter;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -82,7 +78,7 @@ public class CustomerFacade implements CouponClientFacade {
 
 	public CouponClientFacade login(String name, String password, ClientType c) throws LogginEx {
 
-		if (customerService.loggin(name, password) == true && (c == ClientType.Company)) {
+		if (customerService.loggin(name, password, c)) {
 
 			CustomerFacade customerFacade = new CustomerFacade();
 			return customerFacade;

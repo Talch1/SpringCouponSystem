@@ -7,9 +7,8 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
+import com.talch.beans.ClientType;
 import com.talch.beans.Company;
 import com.talch.beans.Coupon;
 import com.talch.beans.CouponType;
@@ -24,6 +23,14 @@ public class CompanyService {
 	CompanyRepostory companyRepostory;
 	@Autowired
 	CouponRepository couponRepository;
+	
+	ClientType clientType = ClientType.Company;
+	
+
+	public ClientType getClientType() {
+		return clientType;
+	}
+
 
 	public Company addCompanyToCompany(Company company) {
 		return companyRepostory.save(company);
@@ -119,9 +126,9 @@ public class CompanyService {
 
 	}
 
-	public boolean loggin(String compName, String password) {
+	public boolean loggin(String compName, String password,ClientType clientType) {
 
-		if (companyRepostory.existsById((companyRepostory.findByCompNameAndPassword(compName, password).getId()))) {
+		if ((companyRepostory.existsById((companyRepostory.findByCompNameAndPassword(compName, password).getId())))&&(clientType.toString().equals(ClientType.Company.toString()))) {
 			return true;
 
 		} else {
@@ -129,4 +136,6 @@ public class CompanyService {
 		}
 
 	}
+
+	
 }

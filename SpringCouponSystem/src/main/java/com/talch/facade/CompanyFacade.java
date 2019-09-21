@@ -104,7 +104,7 @@ public class CompanyFacade implements CouponClientFacade {
 
 	public CouponClientFacade login(String name, String password, ClientType c)throws  LogginEx {
 	
-		if (companyService.loggin(name, password)==true && (c== ClientType.Company)) {
+		if (companyService.loggin(name, password, c)==true ) {
 			
     	CompanyFacade companyFacade = new CompanyFacade();
      	return companyFacade;

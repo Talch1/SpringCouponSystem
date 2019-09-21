@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.talch.beans.ClientType;
 import com.talch.beans.Company;
 import com.talch.beans.Coupon;
 import com.talch.beans.CouponType;
@@ -22,6 +23,8 @@ import com.talch.repo.CustomerRepository;
 @Service
 @Transactional
 public class AdminService {
+
+	ClientType clientType = ClientType.Admin;
 
 	@Autowired
 	CompanyRepostory companyRepostory;
@@ -39,6 +42,10 @@ public class AdminService {
 	CouponType coupType = CouponType.SPORTS;
 	CouponType coupType2 = CouponType.HEALTH;
 	CouponType coupType3 = CouponType.RESTURANS;
+
+	public ClientType getClientType() {
+		return clientType;
+	}
 
 	@PostConstruct
 	public void initDBCoup() {
@@ -217,6 +224,13 @@ public class AdminService {
 	public List<Coupon> getCouponWhenPriceBetwenPrice(Double price1) {
 		return couponRepository.findByPriceLessThan(price1);
 
+	}
+
+	public boolean loggin(String name, String password, ClientType clientType2) {
+		if (name.equals("admin")&&password.equals("1234")&& clientType2.toString().equals(ClientType.Admin.toString())) {
+			
+		}
+		return false;
 	}
 
 }

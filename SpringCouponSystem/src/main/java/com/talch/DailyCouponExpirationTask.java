@@ -1,7 +1,8 @@
 package com.talch;
 
-import java.util.Date;
-import java.util.List;
+
+import java.sql.Date;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -23,8 +24,8 @@ Date date = new Date(System.currentTimeMillis());
 	
 		while (stop) {
 			
-	//		service.findAllWhereEndDateAfterDate(date);
-					//	DELETE FROM new.coupon WHERE end_date < '2019-09-07 08:21:22'
+			service.getCouponByDate(date);
+					
 							
 						
 				try {

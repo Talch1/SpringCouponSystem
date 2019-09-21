@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
 
+import com.talch.beans.ClientType;
 import com.talch.beans.Coupon;
 import com.talch.beans.Customer;
 import com.talch.repo.CustomerRepository;
@@ -16,9 +17,14 @@ import com.talch.repo.CustomerRepository;
 @Service
 @Transactional
 public class CustomerService {
+	ClientType clientType = ClientType.Customer;
 
 	@Autowired
 	CustomerRepository customerRepository;
+
+	public ClientType getClientType() {
+		return clientType;
+	}
 
 	public List<Customer> insertCustomer(Customer customer) {
 		customerRepository.save(customer);
@@ -59,9 +65,9 @@ public class CustomerService {
 
 	}
 
-	public boolean loggin(String custName, String password) {
+	public boolean loggin(String custName, String password,ClientType clientType) {
 
-		if (customerRepository.existsById(customerRepository.findByCustNameAndPassword(custName, password).getId())) {
+		if (customerRepository.existsById(customerRepository.findByCustNameAndPassword(custName, password).getId())&&clientType.toString().equals(ClientType.Customer.toString())) {
 			return true;
 		} else {
 			return false;
