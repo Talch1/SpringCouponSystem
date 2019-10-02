@@ -43,8 +43,8 @@ public class AdminService {
 	CouponType coupType2 = CouponType.HEALTH;
 	CouponType coupType3 = CouponType.RESTURANS;
 
-	public ClientType getClientType() {
-		return clientType;
+	public String getClientType() {
+		return clientType.name();
 	}
 
 	@PostConstruct
@@ -66,8 +66,8 @@ public class AdminService {
 		couponRepository.saveAll(coup);
 
 		List<Company> comp = new ArrayList<>();
-
-		comp.add(new Company(120, "Cola", "alwayseCocaCola ", "Cola@cola.net", null));
+		comp.add(new Company(158, "Kia", "kiamotors", "kiamotors@kiamotors.net", null));
+		comp.add(new Company(120, "Cola", "cocacola", "Cola@cola.net", null));
 		comp.add(new Company(201, "Osem", "bisli", "osem@osem.com", null));
 
 		companyRepostory.saveAll(comp);
@@ -114,7 +114,9 @@ public class AdminService {
 		return compToUpdate;
 
 	}
-
+	public Company getCompanyByNameAndPass(String name,String pass) {
+		return companyRepostory.findByCompNameAndPassword(name, pass);
+	}
 	public void addCoupons(long id, List<Coupon> coupons) {
 		Company compToUpdate = companyRepostory.getOne(id);
 		compToUpdate.setCupons(coupons);
@@ -226,9 +228,9 @@ public class AdminService {
 
 	}
 
-	public boolean loggin(String name, String password, ClientType clientType2) {
-		if (name.equals("admin")&&password.equals("1234")&& clientType2.toString().equals(ClientType.Admin.toString())) {
-			
+	public boolean loggin(String name, String password, String clientType2) {
+		if (name.equals("admin")&&password.equals("1234")&& clientType2.equals(ClientType.Admin.name())) {
+			return true;
 		}
 		return false;
 	}

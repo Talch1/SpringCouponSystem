@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.talch.beans.Company;
@@ -24,117 +26,76 @@ import com.talch.service.CompanyService;
 public class CompanyController {
 
 	@Autowired
-	CompanyService companyService;
+	CompanyService companyService;	
 
-	// http://localhost:8080/company/compCreate
-	@PostMapping(value = "/compCreate")
-	public List<Company> insertC(@RequestBody Company company) {
-		companyService.insertComp(company);
-		return companyService.findAll();
-
-	}
-
-	// http://localhost:8080/company/getByID/{id}
-	@GetMapping(value = "/getCompByID/{id}")
-	Optional<Company> findById(@PathVariable Long id) {
-		return companyService.findById(id);
-	}
-
-	// http://localhost:8080/company/getCompanys
-	@GetMapping(value = "/getCompanys")
-	public List<Company> getAllCompanys() {
-		return companyService.findAll();
-	}
-
-	// http://localhost:8080/company/delete/{id}
-	@DeleteMapping(value = "/deleteComp/{id}")
-	public List<Company> deleteCompany(@PathVariable Long id) {
-		return companyService.deleteCompanyfromCompany(id);
-
-	}
-
-	// http://localhost:8080/company/delete/All
-	@DeleteMapping(value = "/deleteComp/All")
-	public String deleteCompany() {
-		companyService.deleteCompanys();
-		return "All Companyes deleted";
-	}
-
-	// http://localhost:8080/company/compUpadte
-	@PutMapping(value = "/compUpdate/{id}")
-	public Company updateCompany(@PathVariable Long id, @RequestBody Company company) {
-		companyService.updateCompany(id, company);
-		return company;
-	}
 	
 	// http://localhost:8080/company/addCouponToComp
-		@PutMapping(value = "/addCouponToComp/{id}")
-		public String addCompany(@PathVariable Long id, @RequestBody List<Coupon> coupons) {
-			companyService.addCoupons(id, coupons);
-			return "Coupons Added";
+		@PostMapping(value = "/addCouponToComp/{compId}/{coupId}")
+		public List<Coupon> addtoCompCompany(@PathVariable Long compId, @PathVariable Long coupId) {
+			companyService.addCoupons(compId,coupId);
+			return companyService.findAllCoup(compId);
 		}
 
-		// http://localhost:8080/company/createCoup
-		@PostMapping(value = "/createCoupon")
-		public List<Coupon> insertCoup(@RequestBody Coupon coup) {
-			companyService.addCoupon(coup);
-			return companyService.findAllCoup();
+		// http://localhost:8080/company/createCoupon
+		@PostMapping(value = "/createCoupon/{compId}")
+		public Coupon insertCoup(@RequestBody Coupon coupon,@PathVariable long compId) {
+			companyService.addCoupon(coupon);
+			return coupon;
 
 		}
 
-		// http://localhost:8080/company/getCoupByID/{id}
+		// http://localhost:8080/company/getCouponByID/{id}
 		@GetMapping(value = "/getCouponByID/{id}")
 		Optional<Coupon> findById2(@PathVariable Long id) {
 			return companyService.findCoupById(id);
 		}
 
-		// http://localhost:8080/company/getCoupons
-		@GetMapping(value = "/getAllCoupons")
-		public List<Coupon> getAllCoupons() {
-			return companyService.findAllCoup();
-		}
+		// http://localhost:8080/company/getAllCoupons
+				@GetMapping(value = "/getAllCoupons/{compId}")
+				public List<Coupon> getAllCoupons(@PathVariable long compId) {
+					return companyService.findAllCoup(compId);
+				}
 
-		// http://localhost:8080/company/deleteCoup/{id}
+		// http://localhost:8080/company/deleteCoupon/{id}
 		@DeleteMapping(value = "/deleteCoupon/{id}")
 		public List<Coupon> deleteCoup(@PathVariable Long id) {
 			return companyService.deleteCoupon(id);
 		}
 
-		// http://localhost:8080/company/deleteCoup/All
-		@DeleteMapping(value = "/deleteCoupon/All")
-		public String deleteCoupons() {
-			companyService.deleteCoupons();
+		// http://localhost:8080/company/deleteCoupon/All
+		@DeleteMapping(value = "/deleteCoupon/All/{compid}")
+		public String deleteCoupons(@PathVariable long compid) {
+			companyService.deleteCoupons(compid);
 			return "All Companyes deleted";
 		}
 
-		// http://localhost:8080/company/coupUpdate
+		// http://localhost:8080/company/couponUpdate
 		@PutMapping(value = "/couponUpdate/{id}")
-		public Coupon updateCoupon(@PathVariable Long id, @RequestBody Coupon coupon) {
+		public Optional<Company> updateCoupon(@PathVariable Long id, @RequestBody Coupon coupon) {
 			companyService.updateCoupon(id, coupon);
 
-			return coupon;
+			return companyService.findById(id);
 
 		}
 
-		// http://localhost:8080/company/getAllCoupByType
-		@GetMapping(value = "/getAllCouponByType/{type}")
-
-		public List<Coupon> getAllCouponsByType(@PathVariable CouponType type) {
-			return companyService.getCouponByType(type);
-
-		}
-
-		// http://localhost:8080/company/getAllCoupByDate
-		@GetMapping(value = "/getAllCouponByDate/{date}")
-		public List<Coupon> getAllCouponsByDate(@PathVariable Date date) {
-			return companyService.getCouponByDate(date);
+		// http://localhost:8080/company/getAllCouponByType
+		@GetMapping(value = "/getAllCouponByType/{compId}/{type}")
+		public List<Coupon> getAllCouponsByType(@PathVariable  long compId ,@PathVariable CouponType type) {
+			return companyService.getCouponByType(type,compId);
 
 		}
 
-		// http://localhost:8080/company/getAllCoupByPrice
-		@GetMapping(value = "/getAllCouponByPrice/{price1}")
-		public List<Coupon> getCouponWhenPriceBetwenPrice(@PathVariable Double price1) {
-			return companyService.getCouponWhenPriceBetwenPrice(price1);
+		// http://localhost:8080/company/getAllCouponByDate
+		@GetMapping(value = "/getAllCouponByDate/{compId}/{date}")
+		public List<Coupon> getAllCouponsByDate(@PathVariable  long compId,@PathVariable Date date) {
+			return companyService.getCouponByDate(date,compId);
+
+		}
+
+		// http://localhost:8080/company/getAllCouponByPrice
+		@GetMapping(value = "/getAllCouponByPrice/{compId}/{price1}")
+		public List<Coupon> getCouponWhenPriceBetwenPrice(@PathVariable  long compId,@PathVariable Double price1) {
+			return companyService.getCouponWhenPriceBetwenPrice(price1,compId);
 		}
 	}
 

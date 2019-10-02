@@ -1,5 +1,6 @@
 package com.talch.rest;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.talch.beans.Coupon;
+import com.talch.beans.CouponType;
 import com.talch.beans.Customer;
 import com.talch.service.CustomerService;
 
@@ -22,51 +24,36 @@ public class CustomerController {
 	@Autowired
 	CustomerService customerService;
 
-	// http://localhost:8080/customer/custCreate
-	@PostMapping(value = "/custCreate")
-	public List<Customer> insertCu(@RequestBody Customer customer) {
-		customerService.insertCustomer(customer);
-		return customerService.findAll();
-	}
-
-	// http://localhost:8080/customer/getCustByID/{id}
-	@GetMapping(value = "/getCustByID/{id}")
-	Optional<Customer> findById(@PathVariable Long id) {
-		return customerService.findById(id);
-	}
-
-	// http://localhost:8080/customer/getCustomers
-	@GetMapping(value = "/getCustomers")
-	public List<Customer> getAllCustomers() {
-		return customerService.findAll();
-	}
-
-	// http://localhost:8080/customer/deleteCust/{id}
-	@DeleteMapping(value = "/deleteCust/{id}")
-	public List<Customer> deleteCustomer(@PathVariable Long id) {
-		return customerService.deleteCustomer(id);
-
-	}
-
-	// http://localhost:8080/customer/deleteCust/All
-	@DeleteMapping(value = "/deleteCust/All")
-	public String deleteCustomers() {
-		return customerService.deleteCustomers();
-
-	}
-
-	// http://localhost:8080/customer/updateCustomer
-	@PutMapping(value = "/updateCustomer/{id}")
-	public Customer updateCustomer(@PathVariable Long id, @RequestBody Customer customer) {
-		customerService.updateCustomer(id, customer);
-		return customer;
-	}
-
 	// http://localhost:8080/customer/addCouponToCust
-	@PutMapping(value = "/addCouponToCust/{id}")
-	public String addCompany(@PathVariable Long id, @RequestBody List<Coupon> coupons) {
-		customerService.purchoiseCoupon(id, coupons);
+	@PostMapping(value = "/addCouponToCust/{custId}/{couponId}")
+	public String addCompany(@PathVariable long custId, @PathVariable long couponId) {
+		customerService.purchoiseCoupon(custId, couponId);
 		return "Coupons Added";
+	}
+
+	// http://localhost:8080/company/getAllCoupons
+	@GetMapping(value = "/getAllCoupons/{custId}")
+	public List<Coupon> getAllCoupons(@PathVariable long custId) {
+		return customerService.findAllCoup(custId);
+	}
+	// http://localhost:8080/customer/getAllCouponByType
+	@GetMapping(value = "/getAllCouponByType/{custId}/{type}")
+	public List<Coupon> getAllCouponsByType(@PathVariable long custId, @PathVariable CouponType type) {
+		return customerService.getCouponByType(type, custId);
+
+	}
+
+	// http://localhost:8080/customer/getAllCouponByDate
+	@GetMapping(value = "/getAllCouponByDate/{custId}/{date}")
+	public List<Coupon> getAllCouponsByDate(@PathVariable long custId, @PathVariable Date date) {
+		return customerService.getCouponByDate(date, custId);
+
+	}
+
+	// http://localhost:8080/customer/getAllCouponByPrice
+	@GetMapping(value = "/getAllCouponByPrice/{custId}/{price1}")
+	public List<Coupon> getCouponWhenPriceBetwenPrice(@PathVariable long custId, @PathVariable Double price1) {
+		return customerService.getCouponWhenPriceBetwenPrice(price1, custId);
 	}
 
 }

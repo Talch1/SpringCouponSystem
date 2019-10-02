@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.talch.beans.Company;
@@ -30,7 +31,7 @@ public class AdminControlleer {
 
 //******************************Customer**********************************
 
-	// http://localhost:8080/admin/custCreate
+	// http://localhost:8080/admin/customerCreate
 	@PostMapping(value = "/customerCreate")
 	public List<Customer> insertCu(@RequestBody Customer customer) {
 		adminService.insertCust(customer);
@@ -38,7 +39,7 @@ public class AdminControlleer {
 
 	}
 
-	// http://localhost:8080/admin/getByID/{id}
+	// http://localhost:8080/admin/getCustByID/{id}
 	@GetMapping("/getCustByID/{id}")
 	Optional<Customer> findById(@PathVariable Long id) {
 		return adminService.findById(id);
@@ -50,21 +51,21 @@ public class AdminControlleer {
 		return adminService.findAllCust();
 	}
 
-	// http://localhost:8080/admin/delete/{id}
+	// http://localhost:8080/admin/deleteCust/{id}
 	@DeleteMapping(value = "/deleteCust/{id}")
 	public List<Customer> deleteCustomer(@PathVariable Long id) {
 		return adminService.deleteCustomer(id);
 
 	}
 
-	// http://localhost:8080/admin/delete/All
+	// http://localhost:8080/admin/deleteCust/All
 	@DeleteMapping(value = "/deleteCust/All")
 	public String deleteCustomers() {
 		return adminService.deleteCustomers();
 
 	}
 
-	// http://localhost:8080/admin/custUpdate
+	// http://localhost:8080/custUpdate/custUpdate
 	@PutMapping(value = "/custUpdate/{id}")
 	public Customer updateCustomer1(@PathVariable Long id, @RequestBody Customer customer) {
 		adminService.updateCustomer(id, customer);
@@ -78,7 +79,7 @@ public class AdminControlleer {
 		return "Coupons Added";
 	}
 
-	// http://localhost:8080/admin/getCustCoupons
+	// http://localhost:8080/admin/getCompCouponsById
 	@GetMapping(value = "/getCompCouponsById/{id}")
 	public Collection<Coupon> getCustCoupons(@PathVariable Long id) {
 		return adminService.getAllcouponsByCustId(id);
@@ -120,6 +121,13 @@ public class AdminControlleer {
 		return "All Companyes deleted";
 	}
 
+	// http://localhost:8080/admin/getComByNameAndPass
+	@GetMapping(value = "/getComByNameAndPass")
+	public Company getCompanyByNameAndPass(@RequestParam String compName,@RequestParam String password) {
+		
+			return adminService.getCompanyByNameAndPass(compName, password);
+		}
+		
 	// http://localhost:8080/admin/companyUpdate
 	@PutMapping(value = "/companyUpdate/{id}")
 	public List<Company> updateCompany1(@PathVariable Long id, @RequestBody Company company) {

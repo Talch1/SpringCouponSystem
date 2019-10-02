@@ -1,5 +1,7 @@
 package com.talch.service;
 
+import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import java.util.Optional;
@@ -10,8 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.talch.beans.ClientType;
+import com.talch.beans.Company;
 import com.talch.beans.Coupon;
+import com.talch.beans.CouponType;
 import com.talch.beans.Customer;
+import com.talch.repo.CouponRepository;
 import com.talch.repo.CustomerRepository;
 
 @Service
@@ -21,9 +26,11 @@ public class CustomerService {
 
 	@Autowired
 	CustomerRepository customerRepository;
+	@Autowired
+	CouponRepository couponRepository;
 
-	public ClientType getClientType() {
-		return clientType;
+	public String getClientType() {
+		return clientType.name();
 	}
 
 	public List<Customer> insertCustomer(Customer customer) {
@@ -49,7 +56,7 @@ public class CustomerService {
 		return customerRepository.findAll();
 	}
 
-	public Customer updateCustomer(Long id, Customer customer) {
+	public Customer updateCustomer(long id, Customer customer) {
 		Customer custToUpdate = customerRepository.getOne(id);
 		custToUpdate.setCustName(customer.getCustName());
 		custToUpdate.setPassword(customer.getPassword());
@@ -58,21 +65,73 @@ public class CustomerService {
 
 	}
 
-	public void purchoiseCoupon(Long id, List<Coupon> coupons) {
-		Customer compToUpdate = customerRepository.getOne(id);
-		compToUpdate.setCupons(coupons);
-		customerRepository.save(compToUpdate);
+	public void purchoiseCoupon(long id, long coupId) {
+		Coupon coupon =couponRepository.getOne(coupId);
+		Customer custToUpdate = customerRepository.getOne(id);
+		
+		List<Coupon> coupons =  (List<Coupon>) custToUpdate.getCupons();
+		coupons.add(coupon);
+		custToUpdate.setCupons(coupons);
+		customerRepository.save(custToUpdate);
+;
 
 	}
 
-	public boolean loggin(String custName, String password,ClientType clientType) {
+	public List<Coupon> getCouponByType(CouponType type, long compId) {
+		Optional<Customer> company = customerRepository.findById(compId);
+		List<Coupon> coupons = (List<Coupon>) company.get().getCupons();
+		List<Coupon> byType = new ArrayList<Coupon>();
+		for (Coupon coupon : coupons) {
+			if (coupon.getType().equals(type)) {
+				byType.add(coupon);
+			}
+		}
+		return byType;
 
-		if (customerRepository.existsById(customerRepository.findByCustNameAndPassword(custName, password).getId())&&clientType.toString().equals(ClientType.Customer.toString())) {
+	}
+
+	public List<Coupon> getCouponByDate(Date date, long compId) {
+		Optional<Customer> company = customerRepository.findById(compId);
+		List<Coupon> coupons = (List<Coupon>) company.get().getCupons();
+		List<Coupon> byDate = new ArrayList<Coupon>();
+		for (Coupon coupon : coupons) {
+			if (coupon.getEndDate().before(date)) {
+				byDate.add(coupon);
+			}
+		}
+		return byDate;
+
+	}
+
+	public List<Coupon> getCouponWhenPriceBetwenPrice(Double price1, long compId) {
+		Optional<Customer> company = customerRepository.findById(compId);
+		List<Coupon> coupons = (List<Coupon>) company.get().getCupons();
+		List<Coupon> byPrice = new ArrayList<Coupon>();
+		for (Coupon coupon : coupons) {
+			if (coupon.getPrice()<price1) {
+				byPrice.add(coupon);
+			}
+		}
+		return byPrice;
+
+	}
+
+	public boolean loggin(String custName, String password, String clientType) {
+
+		if (customerRepository.existsById(customerRepository.findByCustNameAndPassword(custName, password).getId())
+				&& clientType.equals(ClientType.Customer.toString())) {
 			return true;
 		} else {
 			return false;
 		}
 
 	}
+
+	public List<Coupon> findAllCoup(long custId) {
+			Optional<Customer> company	= customerRepository.findById(custId);
+			List<Coupon> coupons= (List<Coupon>) company.get().getCupons();
+			return coupons;
+		}
+	
 
 }

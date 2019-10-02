@@ -1,6 +1,7 @@
 package com.talch.service;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,13 +28,14 @@ public class CompanyService {
 	ClientType clientType = ClientType.Company;
 	
 
-	public ClientType getClientType() {
-		return clientType;
+	public String getClientType() {
+		return clientType.name();
 	}
 
 
-	public Company addCompanyToCompany(Company company) {
-		return companyRepostory.save(company);
+	public List<Coupon> addCompanyToCompany(Company company) {
+		 companyRepostory.save(company);
+		 return findAllCoup(company.getId());
 	}
 
 	public List<Company> deleteCompanyfromCompany(Long id) {
@@ -70,13 +72,14 @@ public class CompanyService {
 		return companyRepostory.findAll();
 	}
 
-	public void addCoupons(long id, List<Coupon> coupons) {
+	public void addCoupons(long id, long coupId) {
 		Company compToUpdate = companyRepostory.getOne(id);
-		compToUpdate.setCupons(coupons);
+		List<Coupon> list= (List<Coupon>) compToUpdate.getCupons();
+		Coupon coupon = couponRepository.getOne(coupId);
+		list.add(coupon);
+		compToUpdate.setCupons(list);
 		companyRepostory.save(compToUpdate);
-
 	}
-
 	public List<Coupon> addCoupon(Coupon coupon) {
 		couponRepository.save(coupon);
 		return couponRepository.findAll();
@@ -98,39 +101,75 @@ public class CompanyService {
 
 	}
 
-	public String deleteCoupons() {
-		couponRepository.deleteAll();
+	public String deleteCoupons(long id) {
+		Company company = companyRepostory.getOne(id);
+		List<Coupon> coupons = null;
+		company.setCupons(coupons);
+		companyRepostory.save(company);
+		
+	//	couponRepository.deleteAll();
 		return "All Customers Deleted ";
 	}
 
 	public Optional<Coupon> findCoupById(Long id) {
+		
 		return couponRepository.findById(id);
 	}
 
-	public List<Coupon> findAllCoup() {
-		return couponRepository.findAll();
+	public List<Coupon> findAllCoup(Long compId) {
+		Company company	= companyRepostory.getOne(compId);
+		List<Coupon> coupons= (List<Coupon>) company.getCupons();
+		return coupons;
 	}
 
-	public List<Coupon> getCouponByType(CouponType type) {
-		return couponRepository.findByType(type);
+	public List<Coupon> getCouponByType(CouponType type,long compId) {	
+		Optional<Company> company	= companyRepostory.findById(compId);
+		List<Coupon> coupons= (List<Coupon>) company.get().getCupons();
+		List<Coupon> byType = new ArrayList<Coupon>();
+		for (Coupon coupon : coupons) {
+			if (coupon.getType().equals(type)) {
+				byType.add(coupon);
+			}
+		}
+		return byType;
 	}
 
-	public List<Coupon> getCouponByDate(Date date) {
+	public List<Coupon> getCouponByDate(Date date,long compId) {
 
-		return couponRepository.findByEndDateBefore(date);
-
+		
+		Optional<Company> company	= companyRepostory.findById(compId);
+		List<Coupon> coupons= (List<Coupon>) company.get().getCupons();
+		List<Coupon> byDate = new ArrayList<Coupon>();
+		for (Coupon coupon : coupons) {
+			if (coupon.getEndDate().before(date)) {
+				byDate.add(coupon);
+			}
+		}
+		return byDate;
+	
+	}
+	public Company getCompanyByNameAndPass(String name,String pass) {
+		return companyRepostory.findByCompNameAndPassword(name, pass);
 	}
 
-	public List<Coupon> getCouponWhenPriceBetwenPrice(Double price1) {
-		return couponRepository.findByPriceLessThan(price1);
-
+	public List<Coupon> getCouponWhenPriceBetwenPrice(Double price1,long compId) {
+		
+		//return couponRepository.findByPriceLessThan(price1);
+		Optional<Company> company	= companyRepostory.findById(compId);
+		List<Coupon> coupons= (List<Coupon>) company.get().getCupons();
+		List<Coupon> byPrice = new ArrayList<Coupon>();
+		for (Coupon coupon : coupons) {
+			if (coupon.getPrice()<price1) {
+				byPrice.add(coupon);
+			}
+		}
+		return byPrice;
 	}
 
-	public boolean loggin(String compName, String password,ClientType clientType) {
+	public boolean loggin(String compName, String password,String c) {
 
-		if ((companyRepostory.existsById((companyRepostory.findByCompNameAndPassword(compName, password).getId())))&&(clientType.toString().equals(ClientType.Company.toString()))) {
+		if ((companyRepostory.existsById((companyRepostory.findByCompNameAndPassword(compName, password).getId())))&&(c.equals(ClientType.Company.name()))) {
 			return true;
-
 		} else {
 			return false;
 		}

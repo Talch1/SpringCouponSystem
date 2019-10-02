@@ -66,8 +66,8 @@ public class CompanyFacade implements CouponClientFacade {
 		companyService.deleteCoupon(id);
 	}
 
-	public void removeAllCoupon() {
-		companyService.deleteCoupons();
+	public void removeAllCoupon(long id) {
+		companyService.deleteCoupons(id);
 	}
 
 	public Coupon updateCoupon(Coupon coupon, long id) {
@@ -78,8 +78,10 @@ public class CompanyFacade implements CouponClientFacade {
 		return companyService.findCoupById(id);
 	}
 
-	public List<Coupon> getAllCoupons() {
-		return companyService.findAllCoup();
+	public List<Coupon> getAllCoupons(long compId) {
+		Optional<Company> company = companyService.findById(compId);
+		List<Coupon> coupons= companyService.findAllCoup(compId);
+		return coupons;
 	}
 
 	public List<Coupon> getAllCouponsByComp(Company company) {
@@ -88,23 +90,23 @@ public class CompanyFacade implements CouponClientFacade {
 		return coupons;
 	}
 
-	public List<Coupon> getCouponByType(CouponType type) {
-		return companyService.getCouponByType(type);
+	public List<Coupon> getCouponByType(CouponType type,long compId) {
+		return companyService.getCouponByType(type, compId);
 
 	}
 
-	public List<Coupon> getCouponByPrice(double price) {
-		return companyService.getCouponWhenPriceBetwenPrice(price);
+	public List<Coupon> getCouponByPrice(double price,long compId) {
+		return companyService.getCouponWhenPriceBetwenPrice(price,compId);
 	}
 
-	public List<Coupon> getCouponBeforeDate(Date date) {
-		return companyService.getCouponByDate(date);
+	public List<Coupon> getCouponBeforeDate(Date date,long compId) {
+		return companyService.getCouponByDate(date,compId);
 
 	}
 
 	public CouponClientFacade login(String name, String password, ClientType c)throws  LogginEx {
 	
-		if (companyService.loggin(name, password, c)==true ) {
+		if (companyService.loggin(name, password, c.name()) == true ) {
 			
     	CompanyFacade companyFacade = new CompanyFacade();
      	return companyFacade;

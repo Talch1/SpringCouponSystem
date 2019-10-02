@@ -78,7 +78,7 @@ public class CustomerFacade implements CouponClientFacade {
 
 	public CouponClientFacade login(String name, String password, ClientType c) throws LogginEx {
 
-		if (customerService.loggin(name, password, c)) {
+		if (customerService.loggin(name, password, c.name())) {
 
 			CustomerFacade customerFacade = new CustomerFacade();
 			return customerFacade;
