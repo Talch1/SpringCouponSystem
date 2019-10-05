@@ -38,7 +38,7 @@ public class CompanyService {
 		 return findAllCoup(company.getId());
 	}
 
-	public List<Company> deleteCompanyfromCompany(Long id) {
+	public List<Company> deleteCompanyfromCompany(long id) {
 		companyRepostory.deleteById(id);
 		return companyRepostory.findAll();
 	}
@@ -49,7 +49,7 @@ public class CompanyService {
 
 	}
 
-	public Company updateCompany(Long id, Company company) {
+	public Company updateCompany(long id, Company company) {
 		Company compToUpdate = companyRepostory.getOne(id);
 		compToUpdate.setCompName(company.getCompName());
 		compToUpdate.setEmail(company.getEmail());
@@ -64,7 +64,7 @@ public class CompanyService {
 		return "All Customers Deleted ";
 	}
 
-	public Optional<Company> findById(Long id) {
+	public Optional<Company> findById(long id) {
 		return companyRepostory.findById(id);
 	}
 
@@ -72,33 +72,28 @@ public class CompanyService {
 		return companyRepostory.findAll();
 	}
 
-	public void addCoupons(long id, long coupId) {
+	public List<Coupon> addCoupons(long id, long coupId) {
 		Company compToUpdate = companyRepostory.getOne(id);
 		List<Coupon> list= (List<Coupon>) compToUpdate.getCupons();
 		Coupon coupon = couponRepository.getOne(coupId);
 		list.add(coupon);
 		compToUpdate.setCupons(list);
 		companyRepostory.save(compToUpdate);
+		return findAllCoup(id);
 	}
 	public List<Coupon> addCoupon(Coupon coupon) {
 		couponRepository.save(coupon);
 		return couponRepository.findAll();
 	}
 
-	public List<Coupon> deleteCoupon(Long id) {
+	public List<Coupon> deleteCoupon(long id) {
 		couponRepository.deleteById(id);
 		return couponRepository.findAll();
 	}
 
-	public Coupon updateCoupon(Long id, Coupon coupon) {
-		Coupon coupToUpdate = couponRepository.getOne(id);
-		coupToUpdate.setEndDate(coupon.getEndDate());
-
-		coupToUpdate.setPrice(coupon.getPrice());
-		couponRepository.save(coupToUpdate);
-
-		return coupToUpdate;
-
+	public Coupon updateCoupon(Coupon coupon) {		
+		couponRepository.save(coupon);
+		return coupon;
 	}
 
 	public String deleteCoupons(long id) {

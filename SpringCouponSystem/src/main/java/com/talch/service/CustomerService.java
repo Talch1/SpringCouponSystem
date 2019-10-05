@@ -28,6 +28,8 @@ public class CustomerService {
 	CustomerRepository customerRepository;
 	@Autowired
 	CouponRepository couponRepository;
+	
+	
 
 	public String getClientType() {
 		return clientType.name();
@@ -65,10 +67,10 @@ public class CustomerService {
 
 	}
 
-	public void purchoiseCoupon(long id, long coupId) {
-		Coupon coupon =couponRepository.getOne(coupId);
+	public void purchouseCoupon(long id, long coupId) {
+	
 		Customer custToUpdate = customerRepository.getOne(id);
-		
+		Coupon coupon = couponRepository.getOne(coupId);
 		List<Coupon> coupons =  (List<Coupon>) custToUpdate.getCupons();
 		coupons.add(coupon);
 		custToUpdate.setCupons(coupons);
@@ -103,8 +105,8 @@ public class CustomerService {
 
 	}
 
-	public List<Coupon> getCouponWhenPriceBetwenPrice(Double price1, long compId) {
-		Optional<Customer> company = customerRepository.findById(compId);
+	public List<Coupon> getCouponWhenPriceBetwenPrice(Double price1, long custId) {
+		Optional<Customer> company = customerRepository.findById(custId);
 		List<Coupon> coupons = (List<Coupon>) company.get().getCupons();
 		List<Coupon> byPrice = new ArrayList<Coupon>();
 		for (Coupon coupon : coupons) {
@@ -132,6 +134,19 @@ public class CustomerService {
 			List<Coupon> coupons= (List<Coupon>) company.get().getCupons();
 			return coupons;
 		}
+
+	public Coupon getCouponById(long custId, long coupId) {
+		Customer customer = customerRepository.getOne(custId);
+		List<Coupon> coupons = (List<Coupon>) customer.getCupons();
+		Coupon coupon1 = new Coupon();
+		for (Coupon coupon : coupons) {
+			if (coupon.getId()== coupId) {
+				coupon1 = coupon;
+			}
+		
+		}
+		return coupon1;
+	}
 	
 
 }

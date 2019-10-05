@@ -65,7 +65,7 @@ public class AdminControlleer {
 
 	}
 
-	// http://localhost:8080/custUpdate/custUpdate
+	// http://localhost:8080/custUpdate/
 	@PutMapping(value = "/custUpdate/{id}")
 	public Customer updateCustomer1(@PathVariable Long id, @RequestBody Customer customer) {
 		adminService.updateCustomer(id, customer);
@@ -74,9 +74,9 @@ public class AdminControlleer {
 
 	// http://localhost:8080/admin/addCouponToCust
 	@PutMapping(value = "/addCouponToCust/{id}")
-	public String addCoupon(@PathVariable Long id, @RequestBody List<Coupon> coupons) {
-		adminService.purchoiseCoupon(id, coupons);
-		return "Coupons Added";
+	public Collection<Coupon> addCoupon(@PathVariable Long id, @RequestBody Coupon coupon) {
+		adminService.purchoiseCoupon(id, coupon);
+		return adminService.findById(id).get().getCupons();
 	}
 
 	// http://localhost:8080/admin/getCompCouponsById
@@ -95,7 +95,7 @@ public class AdminControlleer {
 
 	}
 
-	// http://localhost:8080/admin/getByID/{id}
+	// http://localhost:8080/admin/getCompByID/{id}
 	@GetMapping(value = "/getCompByID/{id}")
 	Optional<Company> findById1(@PathVariable Long id) {
 		return adminService.geCompany(id);
@@ -130,9 +130,9 @@ public class AdminControlleer {
 		
 	// http://localhost:8080/admin/companyUpdate
 	@PutMapping(value = "/companyUpdate/{id}")
-	public List<Company> updateCompany1(@PathVariable Long id, @RequestBody Company company) {
+	public Company updateCompany1(@PathVariable Long id, @RequestBody Company company) {
 		adminService.updateCompany(id, company);
-		return adminService.findAllCom();
+		return company;
 	}
 
 	// http://localhost:8080/admin/addCouponToComp

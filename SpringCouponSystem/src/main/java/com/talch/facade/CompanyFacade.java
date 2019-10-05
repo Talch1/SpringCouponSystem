@@ -70,8 +70,8 @@ public class CompanyFacade implements CouponClientFacade {
 		companyService.deleteCoupons(id);
 	}
 
-	public Coupon updateCoupon(Coupon coupon, long id) {
-		return companyService.updateCoupon(id, coupon);
+	public Coupon updateCoupon(Coupon coupon) {
+		return companyService.updateCoupon(coupon);
 	}
 
 	public Optional<Coupon> getCoupon(long id) {

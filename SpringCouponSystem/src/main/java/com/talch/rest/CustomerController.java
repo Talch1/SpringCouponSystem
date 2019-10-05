@@ -25,12 +25,11 @@ public class CustomerController {
 	CustomerService customerService;
 
 	// http://localhost:8080/customer/addCouponToCust
-	@PostMapping(value = "/addCouponToCust/{custId}/{couponId}")
-	public String addCompany(@PathVariable long custId, @PathVariable long couponId) {
-		customerService.purchoiseCoupon(custId, couponId);
-		return "Coupons Added";
+	@PutMapping(value = "/addCouponToCust/{custId}")
+	public List<Coupon> purchouse(@PathVariable long custId, @RequestBody long coupId) {
+		customerService.purchouseCoupon(custId, coupId);
+		return customerService.findAllCoup(custId);
 	}
-
 	// http://localhost:8080/company/getAllCoupons
 	@GetMapping(value = "/getAllCoupons/{custId}")
 	public List<Coupon> getAllCoupons(@PathVariable long custId) {
@@ -42,7 +41,11 @@ public class CustomerController {
 		return customerService.getCouponByType(type, custId);
 
 	}
+	@GetMapping(value = "/getAllCouponById/{custId}/{coupId}")
+	public Coupon getAllCouponById(@PathVariable long custId, @PathVariable long id) {
+		return customerService.getCouponById( custId,id);
 
+	}
 	// http://localhost:8080/customer/getAllCouponByDate
 	@GetMapping(value = "/getAllCouponByDate/{custId}/{date}")
 	public List<Coupon> getAllCouponsByDate(@PathVariable long custId, @PathVariable Date date) {

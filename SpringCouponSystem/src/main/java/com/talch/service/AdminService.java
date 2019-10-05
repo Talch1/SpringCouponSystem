@@ -155,7 +155,7 @@ public class AdminService {
 		return customerRepository.findAll();
 	}
 
-	public Customer updateCustomer(Long id, Customer customer) {
+	public Customer updateCustomer(long id, Customer customer) {
 		Customer custToUpdate = customerRepository.getOne(id);
 		custToUpdate.setCustName(customer.getCustName());
 		custToUpdate.setPassword(customer.getPassword());
@@ -164,10 +164,11 @@ public class AdminService {
 
 	}
 
-	public void purchoiseCoupon(Long id, List<Coupon> coupons) {
-		Customer compToUpdate = customerRepository.getOne(id);
-		compToUpdate.setCupons(coupons);
-		customerRepository.save(compToUpdate);
+	public void purchoiseCoupon(long custId,Coupon coupon ) {
+		Customer custToUpdate = customerRepository.getOne(custId);
+		List<Coupon> coupons= (List<Coupon>) custToUpdate.getCupons();
+		coupons.add(coupon);
+		customerRepository.save(custToUpdate);
 
 	}
 
@@ -184,12 +185,12 @@ public class AdminService {
 		return couponRepository.findAll();
 	}
 
-	public List<Coupon> deleteCoupon(Long id) {
+	public List<Coupon> deleteCoupon(long id) {
 		couponRepository.deleteById(id);
 		return couponRepository.findAll();
 	}
 
-	public Coupon updateCoupon(Long id, Coupon coupon) {
+	public Coupon updateCoupon(long id, Coupon coupon) {
 		Coupon coupToUpdate = couponRepository.getOne(id);
 		coupToUpdate.setEndDate(coupon.getEndDate());
 

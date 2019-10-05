@@ -30,10 +30,9 @@ public class CompanyController {
 
 	
 	// http://localhost:8080/company/addCouponToComp
-		@PostMapping(value = "/addCouponToComp/{compId}/{coupId}")
-		public List<Coupon> addtoCompCompany(@PathVariable Long compId, @PathVariable Long coupId) {
-			companyService.addCoupons(compId,coupId);
-			return companyService.findAllCoup(compId);
+		@PutMapping(value = "/addCouponToComp/{compId}")
+		public List<Coupon> addtoCompCompany(@PathVariable long compId, @RequestBody long coupId) {
+			return companyService.addCoupons(compId, coupId);
 		}
 
 		// http://localhost:8080/company/createCoupon
@@ -46,7 +45,7 @@ public class CompanyController {
 
 		// http://localhost:8080/company/getCouponByID/{id}
 		@GetMapping(value = "/getCouponByID/{id}")
-		Optional<Coupon> findById2(@PathVariable Long id) {
+		Optional<Coupon> findById2(@PathVariable long id) {
 			return companyService.findCoupById(id);
 		}
 
@@ -58,7 +57,7 @@ public class CompanyController {
 
 		// http://localhost:8080/company/deleteCoupon/{id}
 		@DeleteMapping(value = "/deleteCoupon/{id}")
-		public List<Coupon> deleteCoup(@PathVariable Long id) {
+		public List<Coupon> deleteCoup(@PathVariable long id) {
 			return companyService.deleteCoupon(id);
 		}
 
@@ -70,12 +69,11 @@ public class CompanyController {
 		}
 
 		// http://localhost:8080/company/couponUpdate
-		@PutMapping(value = "/couponUpdate/{id}")
-		public Optional<Company> updateCoupon(@PathVariable Long id, @RequestBody Coupon coupon) {
-			companyService.updateCoupon(id, coupon);
+		@PutMapping(value = "/couponUpdate")
+		public Optional<Company> updateCoupon( @RequestBody Coupon coupon) {
+			companyService.updateCoupon( coupon);
 
-			return companyService.findById(id);
-
+			return companyService.findById(coupon.getId());
 		}
 
 		// http://localhost:8080/company/getAllCouponByType
