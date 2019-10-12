@@ -16,8 +16,10 @@ import com.talch.beans.Company;
 import com.talch.beans.Coupon;
 import com.talch.beans.CouponType;
 import com.talch.beans.Customer;
+import com.talch.beans.User;
 import com.talch.repo.CouponRepository;
 import com.talch.repo.CustomerRepository;
+import com.talch.repo.UserRepo;
 
 @Service
 @Transactional
@@ -28,6 +30,8 @@ public class CustomerService {
 	CustomerRepository customerRepository;
 	@Autowired
 	CouponRepository couponRepository;
+	@Autowired
+	UserRepo userRepo;
 	
 	
 
@@ -60,8 +64,8 @@ public class CustomerService {
 
 	public Customer updateCustomer(long id, Customer customer) {
 		Customer custToUpdate = customerRepository.getOne(id);
-		custToUpdate.setCustName(customer.getCustName());
-		custToUpdate.setPassword(customer.getPassword());
+		custToUpdate.setCustName(customer.getUser().getName());
+		custToUpdate.setPassword(customer.getUser().getPassword());
 		customerRepository.save(custToUpdate);
 		return custToUpdate;
 
@@ -102,8 +106,20 @@ public class CustomerService {
 			}
 		}
 		return byDate;
-
 	}
+	public Customer getCustomerByNameAndPass(String name,String pass) {
+		User user = userRepo.findByNameAndPassword(name, pass);
+		List<Customer> customers = customerRepository.findAll();
+		Customer c = new Customer();
+		for (Customer customer : customers) {
+			if (customer.getUser().getUserId()== user.getUserId()) {
+				c = customer;
+			}
+			
+		}
+		return c;
+		
+}
 
 	public List<Coupon> getCouponWhenPriceBetwenPrice(Double price1, long custId) {
 		Optional<Customer> company = customerRepository.findById(custId);
@@ -118,9 +134,9 @@ public class CustomerService {
 
 	}
 
-	public boolean loggin(String custName, String password, String clientType) {
+	public boolean loggin(String name, String pass, String clientType) {
 
-		if (customerRepository.existsById(customerRepository.findByCustNameAndPassword(custName, password).getId())
+		if (customerRepository.existsById(getCustomerByNameAndPass(name, pass).getId())
 				&& clientType.equals(ClientType.Customer.toString())) {
 			return true;
 		} else {

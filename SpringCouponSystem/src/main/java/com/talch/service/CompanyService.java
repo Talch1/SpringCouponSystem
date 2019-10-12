@@ -13,8 +13,10 @@ import com.talch.beans.ClientType;
 import com.talch.beans.Company;
 import com.talch.beans.Coupon;
 import com.talch.beans.CouponType;
+import com.talch.beans.User;
 import com.talch.repo.CompanyRepostory;
 import com.talch.repo.CouponRepository;
+import com.talch.repo.UserRepo;
 
 @Service
 @Transactional
@@ -24,6 +26,8 @@ public class CompanyService {
 	CompanyRepostory companyRepostory;
 	@Autowired
 	CouponRepository couponRepository;
+	@Autowired
+	UserRepo userRepo;
 	
 	ClientType clientType = ClientType.Company;
 	
@@ -51,9 +55,9 @@ public class CompanyService {
 
 	public Company updateCompany(long id, Company company) {
 		Company compToUpdate = companyRepostory.getOne(id);
-		compToUpdate.setCompName(company.getCompName());
+		compToUpdate.setName(company.getUser().getName());
 		compToUpdate.setEmail(company.getEmail());
-		compToUpdate.setPassword(company.getPassword());
+		compToUpdate.setPassword(company.getUser().getPassword());
 		companyRepostory.save(compToUpdate);
 		return compToUpdate;
 
@@ -144,8 +148,18 @@ public class CompanyService {
 	
 	}
 	public Company getCompanyByNameAndPass(String name,String pass) {
-		return companyRepostory.findByCompNameAndPassword(name, pass);
-	}
+		User user = userRepo.findByNameAndPassword(name, pass);
+		List<Company> companys = companyRepostory.findAll();
+		Company c = new Company();
+		for (Company company : companys) {
+			if (company.getUser().getUserId()== user.getUserId()) {
+				c = company;
+			}
+			
+		}
+		return c;
+		
+}
 
 	public List<Coupon> getCouponWhenPriceBetwenPrice(Double price1,long compId) {
 		
@@ -161,9 +175,9 @@ public class CompanyService {
 		return byPrice;
 	}
 
-	public boolean loggin(String compName, String password,String c) {
+	public boolean loggin(String name, String password,String c) {
 
-		if ((companyRepostory.existsById((companyRepostory.findByCompNameAndPassword(compName, password).getId())))&&(c.equals(ClientType.Company.name()))) {
+		if ((companyRepostory.existsById((getCompanyByNameAndPass(name, password).getId())))&&(c.equals(ClientType.Company.name()))) {
 			return true;
 		} else {
 			return false;

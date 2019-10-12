@@ -10,5 +10,5 @@ import com.talch.beans.Customer;
 
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
-	public Customer findByCustNameAndPassword(String custName,String password);
+
 }

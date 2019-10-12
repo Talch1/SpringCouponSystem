@@ -16,9 +16,11 @@ import com.talch.beans.Company;
 import com.talch.beans.Coupon;
 import com.talch.beans.CouponType;
 import com.talch.beans.Customer;
+import com.talch.beans.User;
 import com.talch.repo.CompanyRepostory;
 import com.talch.repo.CouponRepository;
 import com.talch.repo.CustomerRepository;
+import com.talch.repo.UserRepo;
 
 @Service
 @Transactional
@@ -34,6 +36,8 @@ public class AdminService {
 
 	@Autowired
 	CouponRepository couponRepository;
+	@Autowired
+	UserRepo userRepo;
 
 	Date date = new Date(System.currentTimeMillis());
 	Date datePlus5Days = new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 5));
@@ -49,10 +53,20 @@ public class AdminService {
 
 	@PostConstruct
 	public void initDBCoup() {
-
+        
 		companyRepostory.deleteAll();
 		customerRepository.deleteAll();
 		couponRepository.deleteAll();
+
+		List<User> user = new ArrayList<>();
+		user.add(new User(11,"Kia","kiamotors",ClientType.Company));
+		user.add(new User(12,"CocaCola","cola",ClientType.Company));
+		user.add(new User(13,"Osem","bisli",ClientType.Company));
+		user.add(new User(14,"Gabi","1985",ClientType.Customer));
+		user.add(new User(15,"Tomer","ppp",ClientType.Customer));
+		user.add(new User(16,"Vasya","GOD",ClientType.Customer));
+
+		userRepo.saveAll(user);
 
 		List<Coupon> coup = new ArrayList<>();
 
@@ -66,16 +80,17 @@ public class AdminService {
 		couponRepository.saveAll(coup);
 
 		List<Company> comp = new ArrayList<>();
-		comp.add(new Company(158, "Kia", "kiamotors", "kiamotors@kiamotors.net", null));
-		comp.add(new Company(120, "Cola", "cocacola", "Cola@cola.net", null));
-		comp.add(new Company(201, "Osem", "bisli", "osem@osem.com", null));
+		comp.add(new Company(1,new User(11,"Kia","kiamotors",ClientType.Company),"kiamotors@kiamotors.net", null));
+		comp.add(new Company(2,new User(12,"CocaCola","cola",ClientType.Company), "Cola@cola.net", null));
+		comp.add(new Company(3,new User(13,"Osem","bisli",ClientType.Company),  "osem@osem.com", null));
 
 		companyRepostory.saveAll(comp);
 
 		List<Customer> cust = new ArrayList<>();
 
-		cust.add(new Customer(2010, "Gabi", "12345", null));
-		cust.add(new Customer(15518, "Tomer", "good", null));
+		cust.add(new Customer(4,new User(14,"Gabi","1985",ClientType.Customer),  null));
+		cust.add(new Customer(5,new User(15,"Tomer","ppp",ClientType.Customer),  null));
+		cust.add(new Customer(6,new User(16,"Vasya","GOD",ClientType.Customer),  null));
 
 		customerRepository.saveAll(cust);
 	}
@@ -107,16 +122,26 @@ public class AdminService {
 
 	public Company updateCompany(Long id, Company company) {
 		Company compToUpdate = companyRepostory.getOne(id);
-		compToUpdate.setCompName(company.getCompName());
+		compToUpdate.setName(company.getUser().getName());
 		compToUpdate.setEmail(company.getEmail());
-		compToUpdate.setPassword(company.getPassword());
+		compToUpdate.setPassword(company.getUser().getPassword());
 		companyRepostory.save(compToUpdate);
 		return compToUpdate;
 
 	}
 	public Company getCompanyByNameAndPass(String name,String pass) {
-		return companyRepostory.findByCompNameAndPassword(name, pass);
-	}
+		User user = userRepo.findByNameAndPassword(name, pass);
+		List<Company> companys = companyRepostory.findAll();
+		Company c = new Company();
+		for (Company company : companys) {
+			if (company.getUser().getUserId()== user.getUserId()) {
+				c = company;
+			}
+			
+		}
+		return c;
+		
+}
 	public void addCoupons(long id, List<Coupon> coupons) {
 		Company compToUpdate = companyRepostory.getOne(id);
 		compToUpdate.setCupons(coupons);
@@ -157,8 +182,8 @@ public class AdminService {
 
 	public Customer updateCustomer(long id, Customer customer) {
 		Customer custToUpdate = customerRepository.getOne(id);
-		custToUpdate.setCustName(customer.getCustName());
-		custToUpdate.setPassword(customer.getPassword());
+		custToUpdate.setCustName(customer.getUser().getName());
+		custToUpdate.setPassword(customer.getUser().getName());
 		customerRepository.save(custToUpdate);
 		return custToUpdate;
 

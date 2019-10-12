@@ -7,53 +7,60 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-@AllArgsConstructor
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 public class Company {
 
+	
+
+
 	private long id;
-
-	private String compName;
-
-	private String password;
+	@Autowired
+	private User user;
 
 	private String email;
 
 	@Autowired
 	private Collection<Coupon> cupons;
 
-	@Id
-	public long getId() {
-		return id;
-	}
-
 	@OneToMany
 	public Collection<Coupon> getCupons() {
 		return cupons;
 	}
-
-	@Column
-	public String getCompName() {
-		return compName;
-	}
-
-	@Column
-	public String getPassword() {
-		return password;
+@Id
+	public long getId() {
+		return id;
 	}
 
 	@Column
 	public String getEmail() {
 		return email;
 	}
+
+	@OneToOne
+	public User getUser() {
+		return user;
+	}
+
+	public void setName(String name) {
+		user.setName(name);
+
+	}
+
+	public void setPassword(String password) {
+		user.setPassword(password);
+
+	}
+
+
 
 }
