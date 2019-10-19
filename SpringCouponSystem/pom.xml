@@ -56,12 +56,8 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
-
-
 </dependency>
-
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>

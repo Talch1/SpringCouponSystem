@@ -40,6 +40,7 @@ public class AdminService {
 	UserRepo userRepo;
 
 	Date date = new Date(System.currentTimeMillis());
+	Date dateMinus = new Date(System.currentTimeMillis() - (1000*60*60*24*5));
 	Date datePlus5Days = new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 5));
 	Date datePlus1Min = new Date(System.currentTimeMillis() + (1000 * 60));
 
@@ -74,7 +75,7 @@ public class AdminService {
 				"www.gvdjshbs.com/xjh.gif"));
 		coup.add(new Coupon(12, "2+1", date, datePlus5Days, 5, coupType2, "just today!", 100.7,
 				"www.wcdvsjv.com/xjh.gif"));
-		coup.add(new Coupon(82, "second helf price", date, datePlus1Min, 5, coupType3, "Sale!", 25.6,
+		coup.add(new Coupon(82, "second helf price", date, dateMinus, 5, coupType3, "Sale!", 25.6,
 				"www.gvdjsjznalnhbs.com/xjh.gif"));
 
 		couponRepository.saveAll(coup);

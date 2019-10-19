@@ -26,9 +26,9 @@ public class LogginController {
 
 // http://localhost:8080/login/logging
 
-	@RequestMapping(value = "/logging", method={RequestMethod.POST}
+	@PostMapping(value = "/logging")
 
-)
+
 	public boolean Loggin(@RequestBody Credantions credantions) {
 
 		if (credantions.getType().equals(companyService.getClientType())) {
