@@ -8,6 +8,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import lombok.AllArgsConstructor;
@@ -40,7 +42,7 @@ public class User {
 		return id;
 	}
 
-	@ManyToMany
+	@OneToMany
 	public Collection<Coupon> getCupons() {
 		return cupons;
 	}

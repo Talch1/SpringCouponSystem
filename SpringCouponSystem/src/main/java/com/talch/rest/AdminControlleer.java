@@ -36,10 +36,10 @@ public class AdminControlleer {
 
 	// http://localhost:8080/admin/customerCreate
 	@PostMapping(value = "/customerCreate")
-	public User insertCust(@RequestBody User customer) throws ExistEx {
-		if (adminService.getUserById(customer.getId()).isPresent()) {
-			throw new ExistEx("This id is exist");
-		}
+	public User insertCust(@RequestBody User customer)  {
+		//if (adminService.getUserById(customer.getId()==0))) {
+		//	throw new ExistEx("This id is exist");
+		//}
 		customer.setRole(Role.Customer);
 		adminService.insertUser(customer);
 		return customer;
@@ -97,12 +97,12 @@ public class AdminControlleer {
 
 	// http://localhost:8080/admin/addCouponToCust
 	@PutMapping(value = "/addCouponToCust/{custId}")
-	public Collection<Coupon> addCoupon(@PathVariable long custId, @RequestBody long coupId) {
+	public Collection<Coupon> addCoupon(@PathVariable long custId, @RequestBody long coupId) throws ExistEx {
 		adminService.addCouponToUser(custId, coupId);
 		return adminService.getUserById(custId).get().getCupons();
 	}
 
-	// http://localhost:8080/admin/getCustCouponsById
+	// http://localhost:8080/admin/getCustCoup
 	@GetMapping(value = "/getCustCoup/{id}")
 	public Collection<Coupon> getCustCoupons(@PathVariable long id) throws ExistEx {
 		Optional<User> user = findById(id);
@@ -120,21 +120,21 @@ public class AdminControlleer {
 		return adminService.getCouponByCustId(custId, coupId);
 	}
 
-	// http://localhost:8080/admin/findCustCoupByType/{CustId}
-	@GetMapping(value = "/findCustCoupByType/{custId}")
-	public List<Coupon> findCustCoupByType(@PathVariable long custId, @RequestBody CouponType type) throws ExistEx {
-		return adminService.getCustCouponByType(custId, type);
+	// http://localhost:8080/admin/findCustCoupByType/{userId}
+	@GetMapping(value = "/findCustCoupByType/{userId}")
+	public List<Coupon> findCustCoupByType(@PathVariable long userId, @RequestBody CouponType type) throws ExistEx {
+		return adminService.getUserCouponByType(userId, type);
 	}
 
-	// http://localhost:8080/admin/findCustCoupByDate/{custId}
-	@GetMapping(value = "/findCustCoupByDate/{custId}")
-	public List<Coupon> findCustCoupByDate(@PathVariable long custId, @RequestBody Date date) throws ExistEx {
-		return adminService.getCustCouponByDateBefore(custId, date);
+	// http://localhost:8080/admin/findCustCoupByDate/{userId}
+	@GetMapping(value = "/findCustCoupByDate/{userId}")
+	public List<Coupon> findCustCoupByDate(@PathVariable long userId, @RequestBody Date date) throws ExistEx {
+		return adminService.getUserCouponByDateBefore(userId, date);
 	}
-	// http://localhost:8080/admin/findCustCoupByPrice/{custId}
-		@GetMapping(value = "/findCustCoupByPrice/{custId}")
-		public List<Coupon> findCustCoupByPrice(@PathVariable long custId, @RequestBody double price) throws ExistEx {
-			return adminService.getCustCouponByPriceLessThat(custId, price);
+	// http://localhost:8080/admin/findCustCoupByPrice/{userId}
+		@GetMapping(value = "/findCustCoupByPrice/{userId}")
+		public List<Coupon> findCustCoupByPrice(@PathVariable long userId, @RequestBody double price) throws ExistEx {
+			return adminService.getUserCouponByPriceLessThat(userId, price);
 		}
 
 	// ***********************Company***************************************
@@ -208,7 +208,7 @@ public class AdminControlleer {
 
 	// http://localhost:8080/admin/addCouponToComp
 	@PutMapping(value = "/addCouponToComp/{userId}")
-	public List<Coupon> addCouponsToComp(@PathVariable long userId, @RequestBody long couponId) {
+	public List<Coupon> addCouponsToComp(@PathVariable long userId, @RequestBody long couponId) throws ExistEx {
 		adminService.addCouponToUser(userId, couponId);
 		List<Coupon> coupons = (List<Coupon>) adminService.getAllcouponsByUserId(userId);
 		return coupons;
@@ -268,7 +268,7 @@ public class AdminControlleer {
 	// http://localhost:8080/admin/coupUpdate
 	@PutMapping(value = "/coupUpdate")
 	public Coupon updateCoupon(@RequestBody Coupon coupon) {
-		adminService.updateCoupon(coupon);
+		adminService.updateCouponAdmin(coupon);
 
 		return coupon;
 

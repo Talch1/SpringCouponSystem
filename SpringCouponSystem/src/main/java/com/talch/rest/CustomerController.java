@@ -27,12 +27,12 @@ public class CustomerController {
 
 	// http://localhost:8080/customer/addCouponToCust
 		@PutMapping(value = "/addCouponToCust/{custId}")
-		public Collection<Coupon> addCoupon(@PathVariable long custId, @RequestBody long coupId) {
+		public Collection<Coupon> addCoupon(@PathVariable long custId, @RequestBody long coupId) throws ExistEx {
 			userService.addCouponToUser(custId, coupId);
 			return userService.getUserById(custId).get().getCupons();
 		}
 		
-	/// http://localhost:8080/customer/getCustCouponsById
+	// http://localhost:8080/customer/getCustCoup
 		@GetMapping(value = "/getCustCoup/{id}")
 		public Collection<Coupon> getCustCoupons(@PathVariable long id) throws ExistEx {
 			Optional<User> user = userService.getUserById(id);
@@ -45,18 +45,18 @@ public class CustomerController {
 	// http://localhost:8080/customer/findCustCoupByType/{CustId}
 	@GetMapping(value = "/findCustCoupByType/{custId}")
 	public List<Coupon> findCustCoupByType(@PathVariable long custId, @RequestBody CouponType type) throws ExistEx {
-		return userService.getCustCouponByType(custId, type);
+		return userService.getUserCouponByType(custId, type);
 	}
 
 	// http://localhost:8080/customer/findCustCoupByDate/{custId}
 	@GetMapping(value = "/findCustCoupByDate/{custId}")
 	public List<Coupon> findCustCoupByDate(@PathVariable long custId, @RequestBody Date date) throws ExistEx {
-		return userService.getCustCouponByDateBefore(custId, date);
+		return userService.getUserCouponByDateBefore(custId, date);
 	}
 	// http://localhost:8080/customer/findCustCoupByPrice/{custId}
 		@GetMapping(value = "/findCustCoupByPrice/{custId}")
 		public List<Coupon> findCustCoupByPrice(@PathVariable long custId, @RequestBody double price) throws ExistEx {
-			return userService.getCustCouponByPriceLessThat(custId, price);
+			return userService.getUserCouponByPriceLessThat(custId, price);
 		}
 
 }
