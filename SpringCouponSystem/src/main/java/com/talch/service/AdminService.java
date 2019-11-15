@@ -5,15 +5,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
-import org.hibernate.annotations.Check;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.talch.beans.Role;
+
 import com.talch.beans.Coupon;
 import com.talch.beans.CouponType;
+import com.talch.beans.Role;
 import com.talch.beans.User;
 import com.talch.exeption.ExistEx;
 import com.talch.repo.CouponRepository;
@@ -21,8 +22,7 @@ import com.talch.repo.UserRepository;
 
 @Service
 @Transactional
-public class UserService {
-
+public class AdminService {
 	@Autowired
 	UserRepository userRepository;
 
@@ -64,17 +64,36 @@ public class UserService {
 
 		userRepository.saveAll(users);
 	}
-//**************************user************************************
 
-	public List<User> insertUser(User user) {
-		userRepository.save(user);
-		return userRepository.findAll();
+	// **************************user************************************
+
+	public Optional<User> insertUser(User user) throws ExistEx {
+		boolean check = false;
+		List<User> users = userRepository.findAll();
+		for (User user2 : users) {
+			if (user.getId() == user2.getId() || user.getUserName().equals(user2.getUserName())) {
+				check = true;
+			}
+		}
+		if (check) {
+			throw new ExistEx("this id or name is exist");
+		} else {
+			userRepository.save(user);
+			return userRepository.findById(user.getId());
+		}
 	}
 
-	public List<User> deleteUserById(Long id) {
-		userRepository.deleteById(id);
-		return userRepository.findAll();
+	public List<User> deleteUserById(long userId,Role role) {
 
+		userRepository.deleteById(userId);
+		List<User> allUsers = userRepository.findAll();
+		List<User> sorted = new ArrayList<User>();
+		for (User user : allUsers) {
+			if (user.getRole().equals(role)) {
+				sorted.add(user);
+			}
+		}
+		return sorted;
 	}
 
 	public String deleteAllUsers(Role role) {
@@ -89,7 +108,7 @@ public class UserService {
 		return "All Customers Deleted ";
 	}
 
-	public Optional<User> getUserById(Long id) {
+	public Optional<User> getUserById(long id) {
 		return userRepository.findById(id);
 	}
 
@@ -109,90 +128,6 @@ public class UserService {
 
 	public User getUserByNameAndPass(String name, String pass) {
 		return userRepository.findByUserNameAndPassword(name, pass);
-	}
-
-	public void addCoupons(long id, List<Coupon> coupons) {
-		User userToUpdate = userRepository.getOne(id);
-		userToUpdate.setCupons(coupons);
-		userRepository.save(userToUpdate);
-
-	}
-
-	public Collection<Coupon> getAllcouponsByCompId(long id) {
-		Optional<User> user = userRepository.findById(id);
-		List<Coupon> coupons = (List<Coupon>) user.get().getCupons();
-		return coupons;
-
-	}
-
-
-	public void addCouponToUser(long userId, long coupId) throws ExistEx {
-		Coupon coupon = couponRepository.getOne(coupId);
-		User userToUpdate = userRepository.getOne(userId);
-		List<Coupon> coupons = (List<Coupon>) userToUpdate.getCupons();
-		if (coupons.contains(coupon)) {
-			throw new ExistEx("You have this coupon");
-		}
-		coupons.add(coupon);
-		userRepository.save(userToUpdate);
-
-	}
-
-	public Collection<Coupon> getAllcouponsByUserId(long id) {
-		Optional<User> user = userRepository.findById(id);
-		List<Coupon> coupons = (List<Coupon>) user.get().getCupons();
-		return coupons;
-
-	}
-
-	public Coupon getCouponByCustId(long custId, long coupId) throws ExistEx {
-		Optional<User> user = userRepository.findById(custId);
-		Coupon userCoupon = new Coupon();
-		List<Coupon> coupons = (List<Coupon>) user.get().getCupons();
-		for (Coupon coupon : coupons) {
-			if (coupon.getId() == coupId) {
-				userCoupon = coupon;
-			} else {
-				throw new ExistEx("This coupon not exist");
-			}
-		}
-		return userCoupon;
-
-	}
-
-	public List<Coupon> getUserCouponByType(long userId, CouponType type) {
-		Optional<User> user = userRepository.findById(userId);
-		List<Coupon> coupons = (List<Coupon>) user.get().getCupons();
-		for (Coupon coupon : coupons) {
-			if (coupon.getType() != type) {
-				coupons.remove(coupon);
-			}
-		}
-		return coupons;
-	}
-
-	public List<Coupon> getUserCouponByDateBefore(long userId, Date date) {
-		Optional<User> user = userRepository.findById(userId);
-		List<Coupon> userCoupons = new ArrayList<Coupon>();
-		List<Coupon> coupons = (List<Coupon>) user.get().getCupons();
-		for (Coupon coupon : coupons) {
-			if (coupon.getEndDate().before(date)) {
-				userCoupons.add(coupon);
-			}
-		}
-		return userCoupons;
-	}
-
-	public List<Coupon> getUserCouponByPriceLessThat(long userId, double price) {
-		Optional<User> user = userRepository.findById(userId);
-		List<Coupon> userCoupons = new ArrayList<Coupon>();
-		List<Coupon> coupons = (List<Coupon>) user.get().getCupons();
-		for (Coupon coupon : coupons) {
-			if (coupon.getPrice() < price) {
-				userCoupons.add(coupon);
-			}
-		}
-		return userCoupons;
 	}
 
 	// **************************CouponS************************************
@@ -306,19 +241,4 @@ public class UserService {
 		return couponRepository.findByPriceLessThan(price1);
 
 	}
-
-	public boolean loggin(String userName, String password, String role) {
-		if ((userName.equals("admin") && password.equals("1234") && role.equals(Role.Admin.name()))
-				|| (userRepository.existsById(userRepository.findByUserNameAndPassword(userName, password).getId())
-						&& (userRepository.findByUserNameAndPassword(userName, password).getRole())
-								.equals(Role.Customer))
-				|| (userRepository.existsById(userRepository.findByUserNameAndPassword(userName, password).getId())
-						&& (userRepository.findByUserNameAndPassword(userName, password).getRole())
-								.equals(Role.Company))) {
-			return true;
-
-		}
-		return false;
-	}
-
 }

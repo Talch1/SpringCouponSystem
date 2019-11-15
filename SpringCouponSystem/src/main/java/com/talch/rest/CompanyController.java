@@ -3,7 +3,6 @@ package com.talch.rest;
 import java.sql.Date;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,7 +18,6 @@ import com.talch.beans.Coupon;
 import com.talch.beans.CouponType;
 import com.talch.exeption.ExistEx;
 import com.talch.service.CompanyService;
-import com.talch.service.UserService;
 
 @RestController
 @RequestMapping("company")

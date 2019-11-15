@@ -1,6 +1,7 @@
 package com.talch.rest;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -21,35 +22,53 @@ import com.talch.beans.CouponType;
 import com.talch.beans.Role;
 import com.talch.beans.User;
 import com.talch.exeption.ExistEx;
-import com.talch.service.UserService;
-
-
+import com.talch.service.AdminService;
+import com.talch.service.CompanyService;
 
 @RestController
 @RequestMapping("/admin/")
 public class AdminControlleer {
 
 	@Autowired
-	UserService adminService;
+	AdminService adminService;
+	@Autowired
+	CompanyService companyService;
 
 //******************************Customer**********************************
 
 	// http://localhost:8080/admin/customerCreate
 	@PostMapping(value = "/customerCreate")
-	public User insertCust(@RequestBody User customer)  {
-		//if (adminService.getUserById(customer.getId()==0))) {
-		//	throw new ExistEx("This id is exist");
-		//}
+	public Optional<User> insertCust(@RequestBody User customer) throws ExistEx {
 		customer.setRole(Role.Customer);
-		adminService.insertUser(customer);
-		return customer;
+		customer.setEmail(null);
+		return adminService.insertUser(customer);
 	}
 
-	// http://localhost:8080/admin/getCustByID/{id}
-	@GetMapping("/getCustByID/{custId}/{coupId}")
-	Optional<User> findById(@PathVariable long id) throws ExistEx {
-		if (adminService.getUserById(id).get().getRole().equals(Role.Customer)) {
-			return adminService.getUserById(id);
+	// http://localhost:8080/admin/deleteCust/{custId}/}
+	@DeleteMapping(value = "/deleteCust/{custId}")
+	public List<User> deleteCustomer(@PathVariable long custId) throws ExistEx {
+		if (adminService.getUserById(custId).get().getRole().equals(Role.Customer)) {
+			return adminService.deleteUserById(custId, Role.Customer);
+		}
+		return null;
+	}
+
+	// http://localhost:8080/custUpdate/
+	@PutMapping(value = "/custUpdate/{id}")
+	public User updateCustomer1(@PathVariable long id, @RequestBody User customer) throws ExistEx {
+
+		if (adminService.updateUser(id, customer).getRole().equals(Role.Customer)) {
+			return adminService.updateUser(id, customer);
+		} else {
+			throw new ExistEx("Id is not exist");
+		}
+	}
+
+	// http://localhost:8080/admin/getCustByID/{custId}
+	@GetMapping(value = "/getCustByID/{custId}")
+	Optional<User> findById(@PathVariable long custId) throws ExistEx {
+		if (adminService.getUserById(custId).get().getRole().equals(Role.Customer)) {
+			return adminService.getUserById(custId);
 		} else {
 			throw new ExistEx("Id is not exist");
 		}
@@ -58,27 +77,14 @@ public class AdminControlleer {
 	// http://localhost:8080/admin/getCustomers
 	@GetMapping(value = "/getCustomers")
 	public List<User> getAllCustomers() {
-
 		List<User> users = adminService.findAllUsers();
-
+		List<User> customersList = new ArrayList<User>();
 		for (User user : users) {
-			if (!user.getRole().equals(Role.Customer)) {
-				users.remove(user);
+			if (user.getRole().equals(Role.Customer)) {
+			customersList.add(user);
 			}
 		}
-		return users;
-	}
-
-	// http://localhost:8080/admin/deleteCust/{id}
-	@DeleteMapping(value = "/deleteCust/{id}")
-	public List<User> deleteCustomer(@PathVariable long id) throws ExistEx {
-		Optional<User> user = adminService.getUserById(id);
-		if (user.get().getRole().equals(Role.Customer)) {
-			return adminService.deleteUserById(id);
-		} else {
-			throw new ExistEx("Id is not exist");
-		}
-
+		return customersList;
 	}
 
 	// http://localhost:8080/admin/deleteCust/All
@@ -88,73 +94,39 @@ public class AdminControlleer {
 		return adminService.deleteAllUsers(role);
 	}
 
-	// http://localhost:8080/custUpdate/
-	@PutMapping(value = "/custUpdate/{id}")
-	public User updateCustomer1(@PathVariable long id, @RequestBody User customer) {
-		adminService.updateUser(id, customer);
-		return customer;
-	}
-
-	// http://localhost:8080/admin/addCouponToCust
-	@PutMapping(value = "/addCouponToCust/{custId}")
-	public Collection<Coupon> addCoupon(@PathVariable long custId, @RequestBody long coupId) throws ExistEx {
-		adminService.addCouponToUser(custId, coupId);
-		return adminService.getUserById(custId).get().getCupons();
-	}
-
-	// http://localhost:8080/admin/getCustCoup
-	@GetMapping(value = "/getCustCoup/{id}")
-	public Collection<Coupon> getCustCoupons(@PathVariable long id) throws ExistEx {
-		Optional<User> user = findById(id);
-		if (user.get().getRole().equals(Role.Customer)) {
-			return adminService.getAllcouponsByUserId(id);
-		} else {
-			throw new ExistEx("Id is not exist");
-		}
-
-	}
-
-	// http://localhost:8080/admin/getCustCoupByID/{custId}/{coupId}
-	@GetMapping(value = "/getCustCoupByID/{custId}/{coupId}")
-	public Coupon findCustCoupById(@PathVariable long custId, @PathVariable long coupId) throws ExistEx {
-		return adminService.getCouponByCustId(custId, coupId);
-	}
-
-	// http://localhost:8080/admin/findCustCoupByType/{userId}
-	@GetMapping(value = "/findCustCoupByType/{userId}")
-	public List<Coupon> findCustCoupByType(@PathVariable long userId, @RequestBody CouponType type) throws ExistEx {
-		return adminService.getUserCouponByType(userId, type);
-	}
-
-	// http://localhost:8080/admin/findCustCoupByDate/{userId}
-	@GetMapping(value = "/findCustCoupByDate/{userId}")
-	public List<Coupon> findCustCoupByDate(@PathVariable long userId, @RequestBody Date date) throws ExistEx {
-		return adminService.getUserCouponByDateBefore(userId, date);
-	}
-	// http://localhost:8080/admin/findCustCoupByPrice/{userId}
-		@GetMapping(value = "/findCustCoupByPrice/{userId}")
-		public List<Coupon> findCustCoupByPrice(@PathVariable long userId, @RequestBody double price) throws ExistEx {
-			return adminService.getUserCouponByPriceLessThat(userId, price);
-		}
-
 	// ***********************Company***************************************
 
 	// http://localhost:8080/admin/compnyCreate
 	@PostMapping(value = "/compnyCreate")
-	public List<User> insertCompany(@RequestBody User company) throws ExistEx {
-		if (adminService.getUserById(company.getId()).isPresent()) {
-			throw new ExistEx("This id is exist");
-		}
+	public Optional<User> insertCompany(@RequestBody User company) throws ExistEx {
 		company.setRole(Role.Company);
 		return adminService.insertUser(company);
-
 	}
 
-	// http://localhost:8080/admin/getCompByID/{id}
-	@GetMapping(value = "/getCompByID/{id}")
-	Optional<User> findById1(@PathVariable long id) throws ExistEx {
-		if (adminService.getUserById(id).get().getRole().equals(Role.Company)) {
-			return adminService.getUserById(id);
+	// http://localhost:8080/admin/deleteComp/{compId}
+	@DeleteMapping(value = "/deleteComp/{compId}")
+	public List<User> deleteCompany(@PathVariable long compId) throws ExistEx {
+		if (adminService.getUserById(compId).get().getRole().equals(Role.Company)) {
+			return adminService.deleteUserById(compId, Role.Company);
+		}
+		return null;
+	}
+
+	// http://localhost:8080/admin/companyUpdate
+	@PutMapping(value = "/companyUpdate/{id}")
+	public User updateCompany1(@PathVariable long id, @RequestBody User company) throws ExistEx {
+		if (adminService.updateUser(id, company).equals(Role.Company)) {
+			return adminService.updateUser(id, company);
+		} else {
+			throw new ExistEx("Id is not exist");
+		}
+	}
+
+	// http://localhost:8080/admin/getCompByID/{compId}
+	@GetMapping(value = "/getCompByID/{compId}")
+	Optional<User> findById1(@PathVariable long compId) throws ExistEx {
+		if (adminService.getUserById(compId).get().getRole().equals(Role.Company)) {
+			return adminService.getUserById(compId);
 		} else {
 			throw new ExistEx("Id is not exist");
 		}
@@ -166,23 +138,13 @@ public class AdminControlleer {
 
 		List<User> users = adminService.findAllUsers();
 
+		List<User> companysList = new ArrayList<User>();
 		for (User user : users) {
-			if (!user.getRole().equals(Role.Company)) {
-				users.remove(user);
+			if (user.getRole().equals(Role.Company)) {
+			companysList.add(user);
 			}
 		}
-		return users;
-	}
-
-	// http://localhost:8080/admin/deleteComp/{id}
-	@DeleteMapping(value = "/deleteComp/{id}")
-	public List<User> deleteCompany(@PathVariable long id) throws ExistEx {
-		Optional<User> user = adminService.getUserById(id);
-		if (user.get().getRole().equals(Role.Company)) {
-			return adminService.deleteUserById(id);
-		} else {
-			throw new ExistEx("Id is not exist");
-		}
+		return companysList;
 	}
 
 	// http://localhost:8080/admin/deleteComp/All
@@ -199,18 +161,11 @@ public class AdminControlleer {
 		return adminService.getUserByNameAndPass(name, pass);
 	}
 
-	// http://localhost:8080/admin/companyUpdate
-	@PutMapping(value = "/companyUpdate/{id}")
-	public User updateCompany1(@PathVariable long id, @RequestBody User company) {
-		adminService.updateUser(id, company);
-		return company;
-	}
-
 	// http://localhost:8080/admin/addCouponToComp
 	@PutMapping(value = "/addCouponToComp/{userId}")
 	public List<Coupon> addCouponsToComp(@PathVariable long userId, @RequestBody long couponId) throws ExistEx {
-		adminService.addCouponToUser(userId, couponId);
-		List<Coupon> coupons = (List<Coupon>) adminService.getAllcouponsByUserId(userId);
+		companyService.addCouponToUser(userId, couponId);
+		List<Coupon> coupons = (List<Coupon>) companyService.getAllcouponsByUserId(userId);
 		return coupons;
 
 	}
@@ -220,7 +175,7 @@ public class AdminControlleer {
 	public Collection<Coupon> getCompCoupons(@PathVariable long id) throws ExistEx {
 		Optional<User> user = findById(id);
 		if (user.get().getRole().equals(Role.Company)) {
-			return adminService.getAllcouponsByUserId(id);
+			return companyService.getAllcouponsByUserId(id);
 		} else {
 			throw new ExistEx("Id is not exist");
 		}

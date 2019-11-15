@@ -17,46 +17,54 @@ import com.talch.beans.CouponType;
 import com.talch.beans.Role;
 import com.talch.beans.User;
 import com.talch.exeption.ExistEx;
-import com.talch.service.UserService;
+import com.talch.service.CustomerService;
 
 @RestController
 @RequestMapping("/customer")
 public class CustomerController {
 	@Autowired
-	UserService userService;
+	CustomerService customerService;
+	
 
 	// http://localhost:8080/customer/addCouponToCust
-		@PutMapping(value = "/addCouponToCust/{custId}")
-		public Collection<Coupon> addCoupon(@PathVariable long custId, @RequestBody long coupId) throws ExistEx {
-			userService.addCouponToUser(custId, coupId);
-			return userService.getUserById(custId).get().getCupons();
-		}
-		
-	// http://localhost:8080/customer/getCustCoup
-		@GetMapping(value = "/getCustCoup/{id}")
-		public Collection<Coupon> getCustCoupons(@PathVariable long id) throws ExistEx {
-			Optional<User> user = userService.getUserById(id);
-			if (user.get().getRole().equals(Role.Customer)) {
-				return userService.getAllcouponsByUserId(id);
-			} else {
-				throw new ExistEx("Id is not exist");
-			}
-		}
-	// http://localhost:8080/customer/findCustCoupByType/{CustId}
-	@GetMapping(value = "/findCustCoupByType/{custId}")
-	public List<Coupon> findCustCoupByType(@PathVariable long custId, @RequestBody CouponType type) throws ExistEx {
-		return userService.getUserCouponByType(custId, type);
+	@PutMapping(value = "/addCouponToCust/{custId}")
+	public Collection<Coupon> addCoupon(@PathVariable long custId, @RequestBody long coupId) throws ExistEx {
+		customerService.addCouponToUser(custId, coupId);
+		return customerService.getUserById(custId).get().getCupons();
 	}
 
-	// http://localhost:8080/customer/findCustCoupByDate/{custId}
-	@GetMapping(value = "/findCustCoupByDate/{custId}")
-	public List<Coupon> findCustCoupByDate(@PathVariable long custId, @RequestBody Date date) throws ExistEx {
-		return userService.getUserCouponByDateBefore(custId, date);
-	}
-	// http://localhost:8080/customer/findCustCoupByPrice/{custId}
-		@GetMapping(value = "/findCustCoupByPrice/{custId}")
-		public List<Coupon> findCustCoupByPrice(@PathVariable long custId, @RequestBody double price) throws ExistEx {
-			return userService.getUserCouponByPriceLessThat(custId, price);
+	// http://localhost:8080/customer/getCustCoup
+	@GetMapping(value = "/getCustCoup/{id}")
+	public Collection<Coupon> getCustCoupons(@PathVariable long id) throws ExistEx {
+		Optional<User> user = customerService.getUserById(id);
+		if (user.get().getRole().equals(Role.Customer)) {
+			return customerService.getAllcouponsByUserId(id);
+		} else {
+			throw new ExistEx("Id is not exist");
 		}
+	}
+	// http://localhost:8080/customer/getCustCoupByID/{custId}/{coupId}
+	@GetMapping(value = "/getCustCoupByID/{custId}/{coupId}")
+	public Coupon findCustCoupById(@PathVariable long custId, @PathVariable long coupId) throws ExistEx {
+		return customerService.getCouponByUserId(custId, coupId);
+	}
+
+	// http://localhost:8080/customer/findCustCoupByType/{userId}/{type}
+	@GetMapping(value = "/findCustCoupByType/{userId}/{type}")
+	public List<Coupon> findCustCoupByType(@PathVariable long userId, @PathVariable CouponType type) throws ExistEx {
+		return customerService.getUserCouponByType(userId, type);
+	}
+
+	// http://localhost:8080/customer/findCustCoupByDate/{userId}/{date}
+	@GetMapping(value = "/findCustCoupByDate/{userId}/{date}")
+	public List<Coupon> findCustCoupByDate(@PathVariable long userId, @PathVariable Date date) throws ExistEx {
+		return customerService.getUserCouponByDateBefore(userId, date);
+	}
+
+	// http://localhost:8080/customer/findCustCoupByPrice/{userId}/{price}
+	@GetMapping(value = "/findCustCoupByPrice/{userId}/{price}")
+	public List<Coupon> findCustCoupByPrice(@PathVariable long userId, @PathVariable double price) throws ExistEx {
+		return customerService.getUserCouponByPriceLessThat(userId, price);
+	}
 
 }

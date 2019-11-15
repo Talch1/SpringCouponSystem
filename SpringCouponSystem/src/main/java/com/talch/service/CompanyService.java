@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.talch.beans.Coupon;
 import com.talch.beans.CouponType;
+import com.talch.beans.Role;
 import com.talch.beans.User;
 import com.talch.exeption.ExistEx;
 import com.talch.repo.CouponRepository;
@@ -142,5 +143,8 @@ public class CompanyService {
 		}
 		return coupon2;
 	}
+	
+
+
 
 }
