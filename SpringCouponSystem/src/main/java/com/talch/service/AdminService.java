@@ -46,11 +46,11 @@ public class AdminService {
 		List<Coupon> coup = new ArrayList<>();
 
 		coup.add(new Coupon(1582, "1+1", date, datePlus5Days, 5, coupType, "just now!", 50.3,
-				"www.gvdjshbs.com/xjh.gif"));
+				"https://www.searchpng.com/wp-content/uploads/2019/09/Sale-PNG.jpg"));
 		coup.add(new Coupon(12, "2+1", date, datePlus5Days, 5, coupType2, "just today!", 100.7,
-				"www.wcdvsjv.com/xjh.gif"));
+				"https://www.searchpng.com/wp-content/uploads/2019/09/Sale-PNG.jpg"));
 		coup.add(new Coupon(82, "second helf price", date, datePlus1Min, 5, coupType3, "Sale!", 25.6,
-				"www.gvdjsjznalnhbs.com/xjh.gif"));
+				"https://www.searchpng.com/wp-content/uploads/2019/09/Sale-PNG.jpg"));
 
 		couponRepository.saveAll(coup);
 

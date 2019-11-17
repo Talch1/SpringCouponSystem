@@ -4,7 +4,6 @@ package com.talch.repo;
 
 
 
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,9 +14,8 @@ import com.talch.beans.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-	public User findByUserNameAndPassword(String custName,String password);
+	public User findByUserNameAndPassword(String userName,String password);
 
-	public void save(Optional<User> user);
 
 
 	

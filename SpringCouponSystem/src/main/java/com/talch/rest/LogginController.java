@@ -1,39 +1,58 @@
 
 package com.talch.rest;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Map;
+import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
+import com.talch.CouponSystem;
 import com.talch.beans.Role;
-import com.talch.beans.User;
+import com.talch.exeption.ExistEx;
+import com.talch.facade.Facade;
 import com.talch.service.LoginService;
-
 
 @RestController
 @RequestMapping("login")
 public class LogginController {
-@Autowired
-LoginService loginService;
+	@Autowired
+	LoginService loginService;
+	@Autowired
 
-// http://localhost:8080/login/logging
+	private Map<String, CustomSession> tokensMap;
+	@Autowired
+	private CouponSystem system;
 
-	@PostMapping(value = "/logging")
+//http://localhost:8080/login/logging
+	@PostMapping(value = "/logging/{username}/{password}/{type}")
 
-	public boolean Loggin(@RequestBody User user) {
-
-		if (user.getRole().equals(Role.Company)) {
-
-			return loginService.loggin(user.getUserName(), user.getPassword(), user.getRole().name());
-		} else if (user.getRole().equals(Role.Customer)) {
-			return loginService.loggin(user.getUserName(), user.getPassword(), user.getRole().name());
-		} else if (user.getRole().equals(Role.Admin)) {
-			return loginService.loggin(user.getUserName(), user.getPassword(), user.getRole().name());
+	public ResponseEntity<String> login(@PathVariable("username") String userName,
+			@PathVariable("password") String password, @PathVariable("type") String type) {
+		if (!type.equals("Admin") && !type.equals("Company") && !type.equals("Customer")) {
+			return new ResponseEntity<>("Wrong type", HttpStatus.UNAUTHORIZED);
 		}
-		return false;
+		CustomSession session = new CustomSession();
+		Facade facade = null;
+		String token = UUID.randomUUID().toString();
+
+		long lastAccessed = System.currentTimeMillis();
+		try {
+			facade = system.login(userName, password, Role.valueOf(type));
+			session.setFacade(facade);
+			session.setLastAccessed(lastAccessed);
+			tokensMap.put(token, session);
+			return ResponseEntity.status(HttpStatus.OK).body(token);
+
+		} catch (ExistEx e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+		}
 	}
 }
