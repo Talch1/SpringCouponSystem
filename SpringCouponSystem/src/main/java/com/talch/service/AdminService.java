@@ -45,22 +45,24 @@ public class AdminService {
 
 		List<Coupon> coup = new ArrayList<>();
 
-		coup.add(new Coupon(1582, "1+1", date, datePlus5Days, 5, coupType, "just now!", 50.3,
+		coup.add(new Coupon(1582, "1+1", date, datePlus5Days, 5, coupType, "just now!", 50,
 				"https://www.searchpng.com/wp-content/uploads/2019/09/Sale-PNG.jpg"));
-		coup.add(new Coupon(12, "2+1", date, datePlus5Days, 5, coupType2, "just today!", 100.7,
+		coup.add(new Coupon(12, "2+1", date, datePlus5Days, 5, coupType2, "just today!", 82,
 				"https://www.searchpng.com/wp-content/uploads/2019/09/Sale-PNG.jpg"));
-		coup.add(new Coupon(82, "second helf price", date, datePlus1Min, 5, coupType3, "Sale!", 25.6,
+		coup.add(new Coupon(82, "second helf price", date, datePlus1Min, 5, coupType3, "Sale!", 25,
 				"https://www.searchpng.com/wp-content/uploads/2019/09/Sale-PNG.jpg"));
 
 		couponRepository.saveAll(coup);
 
 		List<User> users = new ArrayList<>();
-		users.add(new User(158, Role.Company, "Kia", "kiamotors", "kiamotors@kiamotors.net", null));
-		users.add(new User(120, Role.Company, "Cola", "cocacola", "Cola@cola.net", null));
-		users.add(new User(201, Role.Company, "Osem", "bisli", "osem@osem.com", null));
+		users.add(new User(1, Role.Company, "Kia", "kiamotors", "kiamotors@kiamotors.net",1000000, null));
+		users.add(new User(2, Role.Company, "Cola", "cocacola", "Cola@cola.net",1000000, null));
+		users.add(new User(3, Role.Company, "Osem", "bisli", "osem@osem.com",1000000, null));
 
-		users.add(new User(2010, Role.Customer, "Gabi", "12345", null, null));
-		users.add(new User(15518, Role.Customer, "Tomer", "good", null, null));
+		users.add(new User(10, Role.Customer, "Gabi", "151285", null,1000, null));
+		users.add(new User(20, Role.Customer, "Tomer", "goodday", null,1500, null));
+		users.add(new User(30, Role.Customer, "Igor", "987456321", null,1200, null));
+		
 
 		userRepository.saveAll(users);
 	}

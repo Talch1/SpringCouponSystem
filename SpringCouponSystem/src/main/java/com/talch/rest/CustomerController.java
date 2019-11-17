@@ -19,12 +19,11 @@ import com.talch.beans.User;
 import com.talch.exeption.ExistEx;
 import com.talch.service.CustomerService;
 
-@RestController
-@RequestMapping("/customer")
-public class CustomerController {
+   @RestController
+   @RequestMapping("/customer")
+   public class CustomerController {
 	@Autowired
 	CustomerService customerService;
-	
 
 	// http://localhost:8080/customer/addCouponToCust
 	@PutMapping(value = "/addCouponToCust/{custId}")
@@ -43,6 +42,7 @@ public class CustomerController {
 			throw new ExistEx("Id is not exist");
 		}
 	}
+
 	// http://localhost:8080/customer/getCustCoupByID/{custId}/{coupId}
 	@GetMapping(value = "/getCustCoupByID/{custId}/{coupId}")
 	public Coupon findCustCoupById(@PathVariable long custId, @PathVariable long coupId) throws ExistEx {
