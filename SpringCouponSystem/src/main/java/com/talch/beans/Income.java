@@ -1,8 +1,11 @@
 package com.talch.beans;
 
-import java.sql.Date;
+
 
 import javax.persistence.GeneratedValue;
+
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -25,7 +28,7 @@ public class Income {
 
 	private Date date;
 
-	private String description;
+	private Description description;
 
 	private double amount;
 
@@ -39,17 +42,18 @@ public class Income {
 	}
 
 	@Column
-	public String getNameString() {
+	public String getName() {
 		return name;
 	}
 
+	@Column
 	@Temporal(TemporalType.DATE)
 	public Date getDate() {
 		return date;
 	}
 
 	@Column()
-	public String getDescription() {
+	public Description getDescription() {
 		return description;
 	}
 

@@ -19,21 +19,28 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.talch.beans.Coupon;
 import com.talch.beans.CouponType;
+import com.talch.beans.Income;
 import com.talch.beans.Role;
 import com.talch.beans.User;
 import com.talch.exeption.ExistEx;
-import com.talch.service.AdminService;
-import com.talch.service.CompanyService;
+import com.talch.facade.AdminFacade;
+import com.talch.facade.CompanyFacade;
 
 @RestController
 @RequestMapping("/admin/")
 public class AdminControlleer {
 
 	@Autowired
-	AdminService adminService;
+	AdminFacade adminService;
 	@Autowired
-	CompanyService companyService;
+	CompanyFacade companyService;
 
+	
+	// http://localhost:8080/admin/getAllIncome
+	@GetMapping(value = "/getAllIncome")
+	public List<Income> getAllIncome() {
+		return (List<Income>) adminService.viewAllIncomes();
+	}
 //******************************Customer**********************************
 
 	// http://localhost:8080/admin/customerCreate

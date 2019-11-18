@@ -1,4 +1,4 @@
-package com.talch.service;
+package com.talch.facade;
 
 import javax.transaction.Transactional;
 

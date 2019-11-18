@@ -17,13 +17,13 @@ import com.talch.beans.CouponType;
 import com.talch.beans.Role;
 import com.talch.beans.User;
 import com.talch.exeption.ExistEx;
-import com.talch.service.CustomerService;
+import com.talch.facade.CustomerFacade;
 
    @RestController
    @RequestMapping("/customer")
    public class CustomerController {
 	@Autowired
-	CustomerService customerService;
+	CustomerFacade customerService;
 
 	// http://localhost:8080/customer/addCouponToCust
 	@PutMapping(value = "/addCouponToCust/{custId}")

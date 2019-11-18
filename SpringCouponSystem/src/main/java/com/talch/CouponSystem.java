@@ -17,9 +17,6 @@ import com.talch.repo.UserRepository;
 @Service
 public class CouponSystem {
 
-//	@Autowired
-//	private ApplicationContext ctx;
-
 	@Autowired
 	private AdminFacade admin;
 
@@ -35,8 +32,8 @@ public class CouponSystem {
 			User cust = userRepository.findByUserNameAndPassword(userName, password);
 			if ((cust != null)
 					&& (userRepository.findByUserNameAndPassword(userName, password).getRole().equals(Role.Customer))) {
-				// CustomerFacade customer=ctx.getBean(CustomerFacade.class);
 				CustomerFacade customer = new CustomerFacade();
+				customer.setCustName(cust.getUserName());
 				customer.setCustId(cust.getId());
 				return customer;
 			}
@@ -44,9 +41,9 @@ public class CouponSystem {
 			User comp = userRepository.findByUserNameAndPassword(userName, password);
 			if ((comp != null)
 					&& (userRepository.findByUserNameAndPassword(userName, password).getRole().equals(Role.Company))) {
-				// CompanyFacade company=ctx.getBean(CompanyFacade.class);
 				CompanyFacade company = new CompanyFacade();
 				company.setCompId(comp.getId());
+				company.setCompName(comp.getUserName());
 				return company;
 			}
 		}
