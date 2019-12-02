@@ -9,7 +9,6 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.talch.beans.Coupon;
@@ -27,8 +26,8 @@ import lombok.Data;
 @Service
 @Transactional
 @Data
-@Scope("prototype")
-public class CompanyFacade  implements Facade{
+public class CompanyFacade implements Facade {
+
 	@Autowired
 	UserRepository userRepository;
 
@@ -37,47 +36,54 @@ public class CompanyFacade  implements Facade{
 
 	@Autowired
 	IncomeService incomeService;
-	
+
 	private long compId;
 	private String compName;
 	private Role role = Role.Company;
 
-	public void addCouponToUser(long userId, long coupId) throws ExistEx {
-		Coupon coupon = couponRepository.getOne(coupId);
-		User userToUpdate = userRepository.getOne(userId);
-
-		List<Coupon> coupons = (List<Coupon>) userToUpdate.getCupons();
-		if (coupons.contains(coupon)) {
-			throw new ExistEx("You have this coupon");
+	public void addCouponToUser(long userId, long coupId) {
+		if ((couponRepository.getOne(coupId) != null) && (userRepository.getOne(userId) != null)) {
+			Coupon coupon = couponRepository.getOne(coupId);
+			User userToUpdate = userRepository.getOne(userId);
+			List<Coupon> coupons = (List<Coupon>) userToUpdate.getCupons();
+			coupons.add(coupon);
 		}
-
-		coupons.add(coupon);
-		userRepository.save(userToUpdate);
-
 	}
 
 	public Optional<Coupon> findCoupById(long id) {
-		return couponRepository.findById(id);
+			boolean check = false;
+			Collection<Coupon> userCoupons = userRepository.getOne(this.compId).getCupons();
+			for (Coupon coupon2 : userCoupons) {
+				if (id == coupon2.getId()) {
+					check = true;
+				}
+			}
+			if (check) {
+				return couponRepository.findById(id);
+			}
+			return null;
+		
+
 	}
 
-	public List<Coupon> addCoupon(Coupon coupon,long compId) {
+	public List<Coupon> addCoupon(Coupon coupon, long compId) {
 		couponRepository.save(coupon);
 		Income income = new Income();
-		User userToUpdate =userRepository.getOne(compId);
-		
+		User userToUpdate = userRepository.getOne(compId);
+
 		income.setName(userToUpdate.getUserName());
 		income.setDate(new java.util.Date(System.currentTimeMillis()));
 		income.setDescription(Description.Company_Add_Coupon);
 		income.setAmount(100);
 		income.setRole(userToUpdate.getRole());
 		incomeService.storeIncome(income);
-		
+
 		userToUpdate.setAmount(userToUpdate.getAmount() - 100);
 		List<Coupon> coupons = (List<Coupon>) userToUpdate.getCupons();
 		coupons.add(coupon);
 		userToUpdate.setCupons(coupons);
 		userRepository.save(userToUpdate);
-		
+
 		return couponRepository.findAll();
 	}
 
@@ -92,23 +98,16 @@ public class CompanyFacade  implements Facade{
 		List<Coupon> list2 = new ArrayList<Coupon>();
 		if (list.contains(couponRepository.getOne(coupId))) {
 			for (Coupon coupon : list) {
-			if (coupon.getId() != coupId) {
-				list2.add(coupon);
+				if (coupon.getId() != coupId) {
+					list2.add(coupon);
+				}
 			}
-		}
-		user.setCupons(list2);
-		userRepository.save(user);
-		return list2;
-		}else {
+			user.setCupons(list2);
+			userRepository.save(user);
+			return list2;
+		} else {
 			throw new ExistEx("You don't have this coupon");
 		}
-		
-	}
-
-	public Collection<Coupon> getAllcouponsByCompId(long id) {
-		Optional<User> user = userRepository.findById(id);
-		List<Coupon> coupons = (List<Coupon>) user.get().getCupons();
-		return coupons;
 
 	}
 
@@ -125,60 +124,63 @@ public class CompanyFacade  implements Facade{
 		return (List<Coupon>) user.get().getCupons();
 	}
 
-	public Coupon updateCoupon(Coupon coupon, long userId) throws ExistEx {
+	public Coupon updateCoupon(Coupon coupon, long userId) {
 		boolean check = false;
-		List<Coupon> list = (List<Coupon>) userRepository.getOne(userId).getCupons();
-		for (Coupon coupon2 : list) {
+		Collection<Coupon> userCoupons = userRepository.getOne(userId).getCupons();
+		for (Coupon coupon2 : userCoupons) {
 			if (coupon.getId() == coupon2.getId()) {
 				check = true;
 			}
 		}
 		if (check) {
 
-			Coupon coupToUpdate = couponRepository.getOne(coupon.getId());
-			coupToUpdate.setEndDate(coupon.getEndDate());
-			coupToUpdate.setPrice(coupon.getPrice());
+	
+		Coupon coupToUpdate = couponRepository.getOne(coupon.getId());
+		coupToUpdate.setEndDate(coupon.getEndDate());
+		coupToUpdate.setPrice(coupon.getPrice());
 
-			Income income = new Income();
-			income.setName(userRepository.getOne(userId).getUserName());
-			income.setDate(new java.util.Date(System.currentTimeMillis()));
-			income.setDescription(Description.Company_update_Coupon);
-			income.setAmount(10);
-			income.setRole(userRepository.getOne(userId).getRole());
-			incomeService.storeIncome(income);
+		Income income = new Income();
+		income.setName(userRepository.getOne(userId).getUserName());
+		income.setDate(new java.util.Date(System.currentTimeMillis()));
+		income.setDescription(Description.Company_update_Coupon);
+		income.setAmount(10);
+		income.setRole(userRepository.getOne(userId).getRole());
+		incomeService.storeIncome(income);
 
-			User userToUpdate = userRepository.getOne(userId);
-			userToUpdate.setAmount(userToUpdate.getAmount() - 10);
-			userRepository.save(userToUpdate);
+		User userToUpdate = userRepository.getOne(userId);
+		userToUpdate.setAmount(userToUpdate.getAmount() - 10);
+		userRepository.save(userToUpdate);
 
-			couponRepository.save(coupToUpdate);
-		} else {
-			throw new ExistEx("You don't have this coupon");
-		}
+		couponRepository.save(coupToUpdate);
+
 		return couponRepository.getOne(coupon.getId());
+		}else {
+			return null;
+		}
 	}
 
-	public List<Coupon> getUserCouponByType(long userId, CouponType type) {
+	public List<Coupon> getUserCouponByType(long userId, String type) {
 		Optional<User> user = userRepository.findById(userId);
-		List<Coupon> coupons = (List<Coupon>) user.get().getCupons();
-		for (Coupon coupon : coupons) {
-			if (coupon.getType() != type) {
-				coupons.remove(coupon);
+		List<Coupon> allcoupons = (List<Coupon>) user.get().getCupons();
+		List<Coupon>  sorted = new ArrayList<Coupon>();
+		for (Coupon coupon : allcoupons) {
+			if (coupon.getType().name().equals(type)) {
+				sorted.add(coupon);
 			}
 		}
-		return coupons;
+		return sorted;
 	}
 
 	public List<Coupon> getUserCouponByDateBefore(long userId, Date date) {
 		Optional<User> user = userRepository.findById(userId);
-		List<Coupon> userCoupons = new ArrayList<Coupon>();
-		List<Coupon> coupons = (List<Coupon>) user.get().getCupons();
-		for (Coupon coupon : coupons) {
+		List<Coupon> sorted = new ArrayList<Coupon>();
+		List<Coupon> allCoupons = (List<Coupon>) user.get().getCupons();
+		for (Coupon coupon : allCoupons) {
 			if (coupon.getEndDate().before(date)) {
-				userCoupons.add(coupon);
+				sorted.add(coupon);
 			}
 		}
-		return userCoupons;
+		return sorted;
 	}
 
 	public List<Coupon> getUserCouponByPriceLessThat(long userId, double price) {
@@ -193,7 +195,7 @@ public class CompanyFacade  implements Facade{
 		return userCoupons;
 	}
 
-	public Coupon findAllCoupByUser(long userId, long coupId) {
+	public Coupon findCoupfromUserbyCouponId(long userId, long coupId) {
 		List<Coupon> coupons = (List<Coupon>) userRepository.getOne(userId).getCupons();
 		Coupon coupon2 = new Coupon();
 		for (Coupon coupon : coupons) {

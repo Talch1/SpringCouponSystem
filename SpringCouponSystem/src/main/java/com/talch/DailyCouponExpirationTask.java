@@ -7,8 +7,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 
+
 import com.talch.beans.Coupon;
 import com.talch.repo.CouponRepository;
+
 @Async
 public class DailyCouponExpirationTask implements Runnable  {
 

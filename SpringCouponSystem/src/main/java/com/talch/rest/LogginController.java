@@ -16,24 +16,20 @@ import com.talch.CouponSystem;
 import com.talch.beans.Role;
 import com.talch.exeption.ExistEx;
 import com.talch.facade.Facade;
-import com.talch.facade.LoginService;
 
 @RestController
 @RequestMapping("login")
 public class LogginController {
-	@Autowired
-	LoginService loginService;
-	@Autowired
 
-	private Map<String, CustomSession> tokensMap;
 	@Autowired
 	private CouponSystem system;
 
 //http://localhost:8080/login/logging
 	@PostMapping(value = "/logging/{username}/{password}/{type}")
 
-	public ResponseEntity<String> login(@PathVariable("username") String userName,
-			@PathVariable("password") String password, @PathVariable("type") String type) {
+	public ResponseEntity<?> login(@PathVariable("username") String userName, @PathVariable("password") String password,
+			@PathVariable("type") String type) {
+
 		if (!type.equals("Admin") && !type.equals("Company") && !type.equals("Customer")) {
 			return new ResponseEntity<>("Wrong type", HttpStatus.UNAUTHORIZED);
 		}
@@ -44,10 +40,15 @@ public class LogginController {
 		long lastAccessed = System.currentTimeMillis();
 		try {
 			facade = system.login(userName, password, Role.valueOf(type));
-			session.setFacade(facade);
-			session.setLastAccessed(lastAccessed);
-			tokensMap.put(token, session);
-			return ResponseEntity.status(HttpStatus.OK).body(token);
+			if (facade != null) {
+				session.setFacade(facade);
+				session.setLastAccessed(lastAccessed);
+				system.getTokensMap().put(token, session);
+				return ResponseEntity.status(HttpStatus.OK).body(token);
+			} else {
+				System.out.println("facade is null");
+				return null;
+			}
 
 		} catch (ExistEx e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);

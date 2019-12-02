@@ -170,7 +170,7 @@ public class AdminControlleer {
 
 	// http://localhost:8080/admin/addCouponToComp
 	@PutMapping(value = "/addCouponToComp/{userId}")
-	public List<Coupon> addCouponsToComp(@PathVariable long userId, @RequestBody long couponId) throws ExistEx {
+	public List<Coupon> addCouponsToComp(@PathVariable long userId, @RequestBody long couponId) throws Exception {
 		companyService.addCouponToUser(userId, couponId);
 		List<Coupon> coupons = (List<Coupon>) companyService.getAllcouponsByUserId(userId);
 		return coupons;
