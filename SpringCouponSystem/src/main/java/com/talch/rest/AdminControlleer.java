@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.talch.CouponSystem;
 import com.talch.beans.Coupon;
 import com.talch.beans.CouponType;
 import com.talch.beans.Income;
@@ -34,7 +35,15 @@ public class AdminControlleer {
 	AdminFacade adminService;
 	@Autowired
 	CompanyFacade companyService;
+	@Autowired
+	CouponSystem system;
 
+	
+	// http://localhost:8080/admin/logout
+	@PostMapping(value = "/logout")
+	private void logout(@RequestBody String token) {
+	system.getTokensMap().remove(token);
+}
 	
 	// http://localhost:8080/admin/getAllIncome
 	@GetMapping(value = "/getAllIncome")

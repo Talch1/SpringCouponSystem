@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.talch.beans.Coupon;
-import com.talch.beans.CouponType;
 import com.talch.beans.Description;
 import com.talch.beans.Income;
 import com.talch.beans.Role;
@@ -208,6 +207,10 @@ public class CompanyFacade implements Facade {
 
 	public Collection<Income> viewIncomes() {
 		return incomeService.vievIncomeByCompany();
+	}
+	
+	public List<Coupon> getAllCouponsOfAllCompanys() {
+		return couponRepository.findAll();
 	}
 
 }

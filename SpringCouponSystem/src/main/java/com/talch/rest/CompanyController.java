@@ -1,6 +1,7 @@
 package com.talch.rest;
 
 import java.sql.Date;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.talch.CouponSystem;
 import com.talch.beans.Coupon;
-import com.talch.beans.CouponType;
+
 import com.talch.exeption.ExistEx;
 import com.talch.facade.CompanyFacade;
 
@@ -33,7 +34,18 @@ public class CompanyController {
 
 	private CustomSession isActive(String token) {
 		return system.getTokensMap().get(token);
+	}
 
+	// http://localhost:8080/company/logout
+	@PostMapping(value = "/logout")
+	private void logout(@RequestBody String token) {
+		system.getTokensMap().remove(token);
+	}
+
+	// http://localhost:8080/company/seeAllCoupons
+	@GetMapping(value = "/seeAllCoupons")
+	public Collection<Coupon> seeAllCoup() {
+		return userService.getAllCouponsOfAllCompanys();
 	}
 
 	// http://localhost:8080/company/addCouponToComp/{token}
@@ -119,39 +131,43 @@ public class CompanyController {
 		if (customSession != null) {
 			long userId = ((CompanyFacade) customSession.getFacade()).getCompId();
 			userService.updateCoupon(coupon, userId);
-				return ResponseEntity.status(HttpStatus.OK).body(userService.findCoupById(userId));
-			}		return new ResponseEntity(HttpStatus.NOT_FOUND);
+			return ResponseEntity.status(HttpStatus.OK).body(userService.findCoupById(userId));
+		}
+		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
-	
+
 	// http://localhost:8080/company/findUserCoupByType/{token}/{type}
 	@GetMapping(value = "/findUserCoupByType/{token}/{type}")
 	public ResponseEntity<?> findUserCoupByType(@PathVariable String token, @PathVariable String type) {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			long userId = ((CompanyFacade) customSession.getFacade()).getCompId();
-			
-				return ResponseEntity.status(HttpStatus.OK).body(userService.getUserCouponByType(userId, type));
-			}		return new ResponseEntity(HttpStatus.NOT_FOUND);
+
+			return ResponseEntity.status(HttpStatus.OK).body(userService.getUserCouponByType(userId, type));
+		}
+		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
-	
+
 	// http://localhost:8080/company/findUserCoupByDate/{token}/{date}
-		@GetMapping(value = "/findUserCoupByDate/{token}/{date}")
+	@GetMapping(value = "/findUserCoupByDate/{token}/{date}")
 	public ResponseEntity<?> findUserCoupByDate(@PathVariable String token, @PathVariable Date date) {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			long userId = ((CompanyFacade) customSession.getFacade()).getCompId();
-				return ResponseEntity.status(HttpStatus.OK).body(userService.getUserCouponByDateBefore(userId, date));
-			}		return new ResponseEntity(HttpStatus.NOT_FOUND);
+			return ResponseEntity.status(HttpStatus.OK).body(userService.getUserCouponByDateBefore(userId, date));
+		}
+		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-		// http://localhost:8080/company/findUserCoupByPrice/{token}/{price}
-		@GetMapping(value = "/findUserCoupByPrice/{token}/{price}")
-			public ResponseEntity<?> findUserCoupByPrice(@PathVariable String token, @PathVariable double price) {
-				CustomSession customSession = isActive(token);
-				if (customSession != null) {
-					long userId = ((CompanyFacade) customSession.getFacade()).getCompId();
-						return ResponseEntity.status(HttpStatus.OK).body(userService.getUserCouponByPriceLessThat(userId, price));
-					}		return new ResponseEntity(HttpStatus.NOT_FOUND);
-			}
+	// http://localhost:8080/company/findUserCoupByPrice/{token}/{price}
+	@GetMapping(value = "/findUserCoupByPrice/{token}/{price}")
+	public ResponseEntity<?> findUserCoupByPrice(@PathVariable String token, @PathVariable double price) {
+		CustomSession customSession = isActive(token);
+		if (customSession != null) {
+			long userId = ((CompanyFacade) customSession.getFacade()).getCompId();
+			return ResponseEntity.status(HttpStatus.OK).body(userService.getUserCouponByPriceLessThat(userId, price));
+		}
+		return new ResponseEntity(HttpStatus.NOT_FOUND);
+	}
 
 }

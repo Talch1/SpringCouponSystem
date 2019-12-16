@@ -134,4 +134,8 @@ public class CustomerFacade implements Facade {
 		}
 		return userCoupons;
 	}
+	
+	public List<Coupon> getAllCouponsOfAllCompanys() {
+		return couponRepository.findAll();
+	}
 }
