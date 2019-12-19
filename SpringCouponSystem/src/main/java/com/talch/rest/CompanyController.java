@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,7 +39,7 @@ public class CompanyController {
 
 	// http://localhost:8080/company/logout
 	@PostMapping(value = "/logout")
-	private void logout(@RequestBody String token) {
+	private void logout(@RequestHeader String token) {
 		system.getTokensMap().remove(token);
 	}
 
@@ -47,10 +48,9 @@ public class CompanyController {
 	public Collection<Coupon> seeAllCoup() {
 		return userService.getAllCouponsOfAllCompanys();
 	}
-
-	// http://localhost:8080/company/addCouponToComp/{token}
-	@PostMapping(value = "/addCouponToComp/{token}")
-	public ResponseEntity<?> addCouponsToComp(@PathVariable String token, @RequestBody long coupId) {
+	// http://localhost:8080/company/addCouponToComp
+	@PostMapping(value = "/addCouponToComp")
+	public ResponseEntity<?> addCouponsToComp(@RequestHeader String token, @RequestBody long coupId) {
 		CustomSession customSession = isActive(token);
 
 		if (customSession != null) {
@@ -63,9 +63,9 @@ public class CompanyController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// http://localhost:8080/company/createCoup/{token}
-	@PostMapping(value = "/createCoup/{token}")
-	public ResponseEntity<?> insertCoup(@RequestBody Coupon coup, @PathVariable String token) {
+	// http://localhost:8080/company/createCoup
+	@PostMapping(value = "/createCoup")
+	public ResponseEntity<?> insertCoup(@RequestBody Coupon coup, @RequestHeader String token) {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
@@ -76,9 +76,9 @@ public class CompanyController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// http://localhost:8080/company/getCoupByID/{token}/{coupId}
-	@GetMapping(value = "/getCoupByID/{token}/{coupId}")
-	public ResponseEntity<?> getCoupByID(@PathVariable String token, @PathVariable long coupId) {
+	// http://localhost:8080/company/getCoupByID/{coupId}
+	@GetMapping(value = "/getCoupByID/{coupId}")
+	public ResponseEntity<?> getCoupByID(@RequestHeader String token, @PathVariable long coupId) {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
@@ -88,9 +88,9 @@ public class CompanyController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// http://localhost:8080/company/deleteCouponById/{token}/{coupId}
-	@DeleteMapping(value = "/deleteCouponById/{token}/{coupId}")
-	public ResponseEntity<?> deleteCouponById(@PathVariable String token, @PathVariable long coupId) throws ExistEx {
+	// http://localhost:8080/company/deleteCouponById/{coupId}
+	@DeleteMapping(value = "/deleteCouponById/{coupId}")
+	public ResponseEntity<?> deleteCouponById(@RequestHeader String token, @PathVariable long coupId) throws ExistEx {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
@@ -100,9 +100,9 @@ public class CompanyController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// http://localhost:8080/company/getCoupons/{token}"
-	@GetMapping(value = "/getCoupons/{token}")
-	public ResponseEntity<?> getAllCoupons(@PathVariable String token) {
+	// http://localhost:8080/company/getCoupons"
+	@GetMapping(value = "/getCoupons")
+	public ResponseEntity<?> getAllCoupons(@RequestHeader String token) {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
@@ -112,9 +112,9 @@ public class CompanyController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// http://localhost:8080/company/deleteCoup/All/{token}
-	@DeleteMapping(value = "/deleteCoup/All/{token}")
-	public ResponseEntity<?> deleteCoupons(@PathVariable String token) {
+	// http://localhost:8080/company/deleteCoup/All/
+	@DeleteMapping(value = "/deleteCoup/All")
+	public ResponseEntity<?> deleteCoupons(@RequestHeader String token) {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
@@ -124,9 +124,9 @@ public class CompanyController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// http://localhost:8080/company/coupUpdate/{token}
-	@PutMapping(value = "/coupUpdate/{token}")
-	public ResponseEntity<?> updateCoupon(@RequestBody Coupon coupon, @PathVariable String token) {
+	// http://localhost:8080/company/coupUpdate
+	@PutMapping(value = "/coupUpdate")
+	public ResponseEntity<?> updateCoupon(@RequestBody Coupon coupon, @RequestHeader String token) {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			long userId = ((CompanyFacade) customSession.getFacade()).getCompId();
@@ -136,9 +136,9 @@ public class CompanyController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// http://localhost:8080/company/findUserCoupByType/{token}/{type}
-	@GetMapping(value = "/findUserCoupByType/{token}/{type}")
-	public ResponseEntity<?> findUserCoupByType(@PathVariable String token, @PathVariable String type) {
+	// http://localhost:8080/company/findUserCoupByType{type}
+	@GetMapping(value = "/findUserCoupByType/{type}")
+	public ResponseEntity<?> findUserCoupByType(@RequestHeader String token, @PathVariable String type) {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			long userId = ((CompanyFacade) customSession.getFacade()).getCompId();
@@ -148,9 +148,9 @@ public class CompanyController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// http://localhost:8080/company/findUserCoupByDate/{token}/{date}
-	@GetMapping(value = "/findUserCoupByDate/{token}/{date}")
-	public ResponseEntity<?> findUserCoupByDate(@PathVariable String token, @PathVariable Date date) {
+	// http://localhost:8080/company/findUserCoupByDate/{date}
+	@GetMapping(value = "/findUserCoupByDate/{date}")
+	public ResponseEntity<?> findUserCoupByDate(@RequestHeader String token, @PathVariable Date date) {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			long userId = ((CompanyFacade) customSession.getFacade()).getCompId();
@@ -159,9 +159,9 @@ public class CompanyController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// http://localhost:8080/company/findUserCoupByPrice/{token}/{price}
-	@GetMapping(value = "/findUserCoupByPrice/{token}/{price}")
-	public ResponseEntity<?> findUserCoupByPrice(@PathVariable String token, @PathVariable double price) {
+	// http://localhost:8080/company/findUserCoupByPrice/{price}
+	@GetMapping(value = "/findUserCoupByPrice/{price}")
+	public ResponseEntity<?> findUserCoupByPrice(@RequestHeader String token, @PathVariable double price) {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			long userId = ((CompanyFacade) customSession.getFacade()).getCompId();

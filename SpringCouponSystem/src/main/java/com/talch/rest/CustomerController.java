@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,7 +22,6 @@ import com.talch.beans.CouponType;
 import com.talch.beans.Role;
 import com.talch.beans.User;
 import com.talch.exeption.ExistEx;
-import com.talch.facade.CompanyFacade;
 import com.talch.facade.CustomerFacade;
 
 @RestController
@@ -41,7 +40,7 @@ public class CustomerController {
 
 	// http://localhost:8080/admin/logout
 	@PostMapping(value = "/logout")
-	private void logout(@RequestBody String token) {
+	private void logout(@RequestHeader String token) {
 		system.getTokensMap().remove(token);
 	}
 
@@ -51,9 +50,9 @@ public class CustomerController {
 		return customerService.getAllCouponsOfAllCompanys();
 	}
 
-	// http://localhost:8080/customer/addCouponToCust/{token}
-	@PutMapping(value = "/addCouponToCust/{token}")
-	public ResponseEntity<?> addCoupon(@PathVariable String token, @RequestBody long coupId) throws ExistEx {
+	// http://localhost:8080/customer/addCouponToCust/{coupId}
+	@PutMapping(value = "/addCouponToCust/{coupId}")
+	public ResponseEntity<?> addCoupon(@RequestHeader String token, @PathVariable long coupId) throws ExistEx {
 		CustomSession customSession = isActive(token);
 
 		if (customSession != null) {
@@ -66,9 +65,9 @@ public class CustomerController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// http://localhost:8080/customer/getCustCoup/{token}
-	@GetMapping(value = "/getCustCoup/{token}")
-	public ResponseEntity<?> getCustCoupons(@PathVariable String token) {
+	// http://localhost:8080/customer/getCustCoup
+	@GetMapping(value = "/getCustCoup")
+	public ResponseEntity<?> getCustCoupons(@RequestHeader String token) {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
@@ -81,9 +80,9 @@ public class CustomerController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// http://localhost:8080/customer/getCustCoupByID/{token}/{coupId}
-	@GetMapping(value = "/getCustCoupByID/{token}/{coupId}")
-	public ResponseEntity<?> findCustCoupById(@PathVariable String token, @PathVariable long coupId) throws ExistEx {
+	// http://localhost:8080/customer/getCustCoupByID/{coupId}
+	@GetMapping(value = "/getCustCoupByID/{coupId}")
+	public ResponseEntity<?> findCustCoupById(@RequestHeader String token, @PathVariable long coupId) throws ExistEx {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
@@ -93,9 +92,9 @@ public class CustomerController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// http://localhost:8080/customer/findCustCoupByType/{token}/{type}
-	@GetMapping(value = "/findCustCoupByType/{token}/{type}")
-	public ResponseEntity<?> findCustCoupByType(@PathVariable String token, @PathVariable CouponType type)
+	// http://localhost:8080/customer/findCustCoupByType/{type}
+	@GetMapping(value = "/findCustCoupByType/{type}")
+	public ResponseEntity<?> findCustCoupByType(@RequestHeader String token, @PathVariable CouponType type)
 			throws ExistEx {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
@@ -106,9 +105,9 @@ public class CustomerController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// http://localhost:8080/customer/findCustCoupByDate/{token}/{date}
-	@GetMapping(value = "/findCustCoupByDate/{token}/{date}")
-	public ResponseEntity<?> findCustCoupByDate(@PathVariable String token, @PathVariable Date date) throws ExistEx {
+	// http://localhost:8080/customer/findCustCoupByDate/{date}
+	@GetMapping(value = "/findCustCoupByDate/{date}")
+	public ResponseEntity<?> findCustCoupByDate(@RequestHeader String token, @PathVariable Date date) throws ExistEx {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
@@ -118,9 +117,9 @@ public class CustomerController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// http://localhost:8080/customer/findCustCoupByPrice/{token}/{price}
-	@GetMapping(value = "/findCustCoupByPrice/{token}/{price}")
-	public ResponseEntity<?> findCustCoupByPrice(@PathVariable String token, @PathVariable double price)
+	// http://localhost:8080/customer/findCustCoupByPrice/{price}
+	@GetMapping(value = "/findCustCoupByPrice/{price}")
+	public ResponseEntity<?> findCustCoupByPrice(@RequestHeader String token, @PathVariable double price)
 			throws ExistEx {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
