@@ -2,7 +2,6 @@ package com.talch.rest;
 
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,8 +29,6 @@ import com.talch.exeption.ExistEx;
 import com.talch.facade.AdminFacade;
 import com.talch.facade.CompanyFacade;
 
-import antlr.Token;
-
 @RestController
 @RequestMapping("/admin/")
 public class AdminControlleer {
@@ -49,7 +46,7 @@ public class AdminControlleer {
 
 	// http://localhost:8080/admin/logout
 	@PostMapping(value = "/logout")
-	private void logout(@RequestBody String token) {
+	private void logout(@RequestHeader String token) {
 		system.getTokensMap().remove(token);
 	}
 
@@ -68,6 +65,7 @@ public class AdminControlleer {
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
 			customer.setRole(Role.Customer);
+			customer.setAmount(1000);
 			customer.setEmail(null);
 			return ResponseEntity.status(HttpStatus.OK).body(adminService.insertUser(customer));
 		}
@@ -87,7 +85,7 @@ public class AdminControlleer {
 		return new ResponseEntity(HttpStatus.BAD_REQUEST);
 	}
 
-	// http://localhost:8080/custUpdate/{id}
+	// http://localhost:8080/admin/custUpdate/{id}
 	@PutMapping(value = "/custUpdate/{id}")
 	public ResponseEntity<?> updateCustomer1(@PathVariable long id, @RequestBody User customer,
 			@RequestHeader String token) {
@@ -95,7 +93,8 @@ public class AdminControlleer {
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
 			if (adminService.updateUser(id, customer).getRole().equals(Role.Customer)) {
-				return ResponseEntity.status(HttpStatus.OK).body(adminService.updateUser(id, customer));
+				adminService.updateUser(id, customer);
+				return ResponseEntity.status(HttpStatus.OK).body(adminService.getUserById(customer.getId()));
 			}
 		}
 		return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -120,14 +119,7 @@ public class AdminControlleer {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
-			List<User> users = adminService.findAllUsers();
-			List<User> customersList = new ArrayList<User>();
-			for (User user : users) {
-				if (user.getRole().equals(Role.Customer)) {
-					customersList.add(user);
-				}
-			}
-			return ResponseEntity.status(HttpStatus.OK).body(customersList);
+			return ResponseEntity.status(HttpStatus.OK).body(adminService.findAllCust());
 		}
 		return new ResponseEntity(HttpStatus.BAD_REQUEST);
 	}
@@ -152,6 +144,7 @@ public class AdminControlleer {
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
 			company.setRole(Role.Company);
+			company.setAmount(100000);
 			return ResponseEntity.status(HttpStatus.OK).body(adminService.insertUser(company));
 		}
 		return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -163,7 +156,6 @@ public class AdminControlleer {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
-
 			if (adminService.getUserById(compId).get().getRole().equals(Role.Company)) {
 				return ResponseEntity.status(HttpStatus.OK).body(adminService.deleteUserById(compId, Role.Company));
 			}
@@ -178,8 +170,9 @@ public class AdminControlleer {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
-			if (adminService.updateUser(id, company).equals(Role.Company)) {
-				return ResponseEntity.status(HttpStatus.OK).body(adminService.updateUser(id, company));
+			if (adminService.updateUser(id, company).getRole().equals(Role.Company)) {
+				adminService.updateUser(id, company);
+				return ResponseEntity.status(HttpStatus.OK).body(adminService.getUserById(company.getId()));
 			}
 		}
 		return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -204,14 +197,7 @@ public class AdminControlleer {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
-			List<User> users = adminService.findAllUsers();
-			List<User> companysList = new ArrayList<User>();
-			for (User user : users) {
-				if (user.getRole().equals(Role.Company)) {
-					companysList.add(user);
-				}
-			}
-			return ResponseEntity.status(HttpStatus.OK).body(companysList);
+			return ResponseEntity.status(HttpStatus.OK).body(adminService.findAllComp());
 		}
 		return new ResponseEntity(HttpStatus.BAD_REQUEST);
 	}
@@ -231,38 +217,41 @@ public class AdminControlleer {
 
 	// http://localhost:8080/admin/getComByNameAndPass
 	@GetMapping(value = "/getComByNameAndPass")
-	public ResponseEntity<?> getCompanyByNameAndPass(@RequestParam String name, @RequestParam String pass,@RequestHeader String token) {
+	public ResponseEntity<?> getCompanyByNameAndPass(@RequestParam String name, @RequestParam String pass,
+			@RequestHeader String token) {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
-		
-		return ResponseEntity.status(HttpStatus.OK).body(adminService.getUserByNameAndPass(name, pass));
-	}
+
+			return ResponseEntity.status(HttpStatus.OK).body(adminService.getUserByNameAndPass(name, pass));
+		}
 		return new ResponseEntity(HttpStatus.BAD_REQUEST);
 	}
+
 	// http://localhost:8080/admin/addCouponToComp
 	@PutMapping(value = "/addCouponToComp/{userId}")
-	public ResponseEntity<?> addCouponsToComp(@PathVariable long userId, @RequestBody long couponId,@RequestHeader String token)  {
+	public ResponseEntity<?> addCouponsToComp(@PathVariable long userId, @RequestBody long couponId,
+			@RequestHeader String token) {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
-		companyService.addCouponToUser(userId, couponId);
-		List<Coupon> coupons = (List<Coupon>) companyService.getAllcouponsByUserId(userId);
-		return ResponseEntity.status(HttpStatus.OK).body(coupons);
-	}
+			companyService.addCouponToUser(userId, couponId);
+			List<Coupon> coupons = (List<Coupon>) companyService.getAllcouponsByUserId(userId);
+			return ResponseEntity.status(HttpStatus.OK).body(coupons);
+		}
 		return new ResponseEntity(HttpStatus.BAD_REQUEST);
 	}
-	
+
 	// http://localhost:8080/admin/getCompCoupons
 	@GetMapping(value = "/getCompCoupons/{id}")
-	public ResponseEntity<?> getCompCoupons(@PathVariable long id,@RequestHeader String token)  {
+	public ResponseEntity<?> getCompCoupons(@PathVariable long id, @RequestHeader String token) {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
-		Optional<User> user = adminService.getUserById(id);
-		if (user.get().getRole().equals(Role.Company)) {
-			return ResponseEntity.status(HttpStatus.OK).body(companyService.getAllcouponsByUserId(id));
-		}
+			Optional<User> user = adminService.getUserById(id);
+			if (user.get().getRole().equals(Role.Company)) {
+				return ResponseEntity.status(HttpStatus.OK).body(companyService.getAllcouponsByUserId(id));
+			}
 		}
 		return new ResponseEntity(HttpStatus.BAD_REQUEST);
 	}
@@ -271,67 +260,101 @@ public class AdminControlleer {
 
 	// http://localhost:8080/admin/createCoup
 	@PostMapping(value = "/createCoup")
-	public List<Coupon> insertCoup(@RequestBody Coupon coup) throws ExistEx {
-		if (adminService.findCoupById(coup.getId()).isPresent()) {
-			throw new ExistEx("This id is exist");
+	public ResponseEntity<?> insertCoup(@RequestBody Coupon coup, @RequestHeader String token) {
+		CustomSession customSession = isActive(token);
+		if (customSession != null) {
+			if (adminService.findCoupById(coup.getId()).isPresent()) {
+				return new ResponseEntity(HttpStatus.NOT_FOUND);
+			}
+			adminService.addCoupon(coup);
+			return ResponseEntity.status(HttpStatus.OK).body(adminService.findAllCoup());
 		}
-		adminService.addCoupon(coup);
-		return adminService.findAllCoup();
-
+		return new ResponseEntity(HttpStatus.BAD_REQUEST);
 	}
 
 	// http://localhost:8080/admin/getCoupByID/{id}
 	@GetMapping(value = "/getCoupByID/{id}")
-	Optional<Coupon> findById2(@PathVariable Long id) {
-		return adminService.findCoupById(id);
+	public ResponseEntity<?> findById2(@PathVariable Long id, @RequestHeader String token) {
+		CustomSession customSession = isActive(token);
+		if (customSession != null) {
+			return ResponseEntity.status(HttpStatus.OK).body(adminService.findCoupById(id));
+		}
+		return new ResponseEntity(HttpStatus.BAD_REQUEST);
 	}
 
 	// http://localhost:8080/admin/getCoupons
 	@GetMapping(value = "/getCoupons")
-	public List<Coupon> getAllCoupons() {
-		return adminService.findAllCoup();
+	public ResponseEntity<?> getAllCoupons(@RequestHeader String token) {
+		CustomSession customSession = isActive(token);
+		if (customSession != null) {
+
+			return ResponseEntity.status(HttpStatus.OK).body(adminService.findAllCoup());
+		}
+		return new ResponseEntity(HttpStatus.BAD_REQUEST);
 	}
 
 	// http://localhost:8080/admin/deleteCoup/{id}
 	@DeleteMapping(value = "/deleteCoup/{id}")
-	public List<Coupon> deleteCoup(@PathVariable Long id) {
-		return adminService.deleteCoupon(id);
+	public ResponseEntity<?> deleteCoup(@PathVariable Long id, @RequestHeader String token) {
+		CustomSession customSession = isActive(token);
+		if (customSession != null) {
+
+			return ResponseEntity.status(HttpStatus.OK).body(adminService.deleteCoupon(id));
+		}
+		return new ResponseEntity(HttpStatus.BAD_REQUEST);
 	}
 
 	// http://localhost:8080/admin/deleteCoup/All
 	@DeleteMapping(value = "/deleteCoup/All")
-	public List<Coupon> deleteCoupons() {
-		adminService.deleteCoupons();
-		return adminService.findAllCoup();
+	public ResponseEntity<?> deleteCoupons(@RequestHeader String token) {
+		CustomSession customSession = isActive(token);
+		if (customSession != null) {
+			adminService.deleteCoupons();
+			return ResponseEntity.status(HttpStatus.OK).body(adminService.findAllCoup());
+		}
+		return new ResponseEntity(HttpStatus.BAD_REQUEST);
 	}
 
 	// http://localhost:8080/admin/coupUpdate
 	@PutMapping(value = "/coupUpdate")
-	public Coupon updateCoupon(@RequestBody Coupon coupon) {
-		adminService.updateCouponAdmin(coupon);
+	public ResponseEntity<?> updateCoupon(@RequestBody Coupon coupon, @RequestHeader String token) {
+		CustomSession customSession = isActive(token);
+		if (customSession != null) {
 
-		return coupon;
+			adminService.updateCouponAdmin(coupon);
 
+			return ResponseEntity.status(HttpStatus.OK).body(coupon);
+		}
+		return new ResponseEntity(HttpStatus.BAD_REQUEST);
 	}
 
 	// http://localhost:8080/admin/getAllCoupByType
 	@GetMapping(value = "/getAllCoupByType/{type}")
-
-	public List<Coupon> getAllCouponsByType(@PathVariable CouponType type) {
-		return adminService.getCouponByType(type);
-
+	public ResponseEntity<?> getAllCouponsByType(@PathVariable CouponType type, @RequestHeader String token) {
+		CustomSession customSession = isActive(token);
+		if (customSession != null) {
+			return ResponseEntity.status(HttpStatus.OK).body(adminService.getCouponByType(type));
+		}
+		return new ResponseEntity(HttpStatus.BAD_REQUEST);
 	}
 
 	// http://localhost:8080/admin/getAllCoupByDate
 	@GetMapping(value = "/getAllCoupByDate/{date}")
-	public List<Coupon> getAllCouponsByDate(@PathVariable Date date) {
-		return adminService.getCouponByDate(date);
-
+	public ResponseEntity<?> getAllCouponsByDate(@PathVariable Date date, @RequestHeader String token) {
+		CustomSession customSession = isActive(token);
+		if (customSession != null) {
+			return ResponseEntity.status(HttpStatus.OK).body(adminService.getCouponByDate(date));
+		}
+		return new ResponseEntity(HttpStatus.BAD_REQUEST);
 	}
 
 	// http://localhost:8080/admin/getAllCoupByPrice
 	@GetMapping(value = "/getAllCoupByPrice/{price1}")
-	public List<Coupon> getCouponWhenPriceBetwenPrice(@PathVariable Double price1) {
-		return adminService.getCouponWhenPriceBetwenPrice(price1);
+	public ResponseEntity<?> getCouponWhenPriceBetwenPrice(@PathVariable Double price1, @RequestHeader String token) {
+		CustomSession customSession = isActive(token);
+		if (customSession != null) {
+			return ResponseEntity.status(HttpStatus.OK).body(adminService.getCouponWhenPriceBetwenPrice(price1));
+		}
+		return new ResponseEntity(HttpStatus.BAD_REQUEST);
 	}
 }

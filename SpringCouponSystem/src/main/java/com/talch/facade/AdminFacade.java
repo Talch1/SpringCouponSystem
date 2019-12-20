@@ -135,6 +135,28 @@ public class AdminFacade implements Facade{
 		return userRepository.findAll();
 	}
 
+	public List<User> findAllCust(){
+		List<User> users = findAllUsers();
+		List<User> customersList = new ArrayList<User>();
+		for (User user : users) {
+			if (user.getRole().equals(Role.Customer)) {
+				customersList.add(user);
+			}
+		}
+		return customersList;
+	}
+	
+	public List<User> findAllComp(){
+		List<User> users = findAllUsers();
+		List<User> compList = new ArrayList<User>();
+		for (User user : users) {
+			if (user.getRole().equals(Role.Company)) {
+				compList.add(user);
+			}
+		}
+		return compList;
+	}
+	
 	public User updateUser(long userIdtoUpdate, User user) {
 		User userToUpdate = userRepository.getOne(userIdtoUpdate);
 		userToUpdate.setUserName(user.getUserName());
