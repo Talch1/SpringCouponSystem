@@ -21,12 +21,15 @@ import com.talch.exeption.ExistEx;
 import com.talch.repo.CouponRepository;
 import com.talch.repo.UserRepository;
 
+import lombok.Data;
+
 @Service
 @Transactional
+@Data
 public class AdminFacade implements Facade{
 	
 	
-	private long id = 1;
+	private final long id = 1;
 	private String name= "Admin";
 	private Role role = Role.Admin;
 	
@@ -76,14 +79,6 @@ public class AdminFacade implements Facade{
 		userRepository.saveAll(users);
 	}
 
-	public Collection<Income> viewAllIncomes() {
-		return incomeService.viewAllIncome();
-
-	}
-
-	private Collection<Income> viewAllCustIncomes() {
-		return incomeService.vievIncomeByCustomer();
-	}
 	// **************************user************************************
 
 	public Optional<User> insertUser(User user) throws ExistEx {
@@ -281,6 +276,11 @@ public class AdminFacade implements Facade{
 	public List<Coupon> getCouponWhenPriceBetwenPrice(Double price1) {
 		return couponRepository.findByPriceLessThan(price1);
 
+	}
+
+	public long getId() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

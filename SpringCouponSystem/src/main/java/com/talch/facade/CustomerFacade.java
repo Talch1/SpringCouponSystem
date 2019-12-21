@@ -66,6 +66,7 @@ public class CustomerFacade implements Facade {
 		income.setDescription(Description.Bay_Coupon_By_User);
 		income.setAmount(coupon.getPrice());
 		income.setRole(userToUpdate.getRole());
+		income.setUserId(userId);
 		
 		double amountTmp = userToUpdate.getAmount();
 		userToUpdate.setAmount(amountTmp-coupon.getPrice());
@@ -138,4 +139,5 @@ public class CustomerFacade implements Facade {
 	public List<Coupon> getAllCouponsOfAllCompanys() {
 		return couponRepository.findAll();
 	}
+
 }

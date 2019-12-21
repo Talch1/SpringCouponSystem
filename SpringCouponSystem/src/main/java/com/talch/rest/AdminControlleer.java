@@ -50,11 +50,7 @@ public class AdminControlleer {
 		system.getTokensMap().remove(token);
 	}
 
-	// http://localhost:8080/admin/getAllIncome
-	@GetMapping(value = "/getAllIncome")
-	public List<Income> getAllIncome() {
-		return (List<Income>) adminService.viewAllIncomes();
-	}
+	
 //******************************Customer**********************************
 
 	// http://localhost:8080/admin/customerCreate

@@ -33,6 +33,8 @@ public class Income {
 	private double amount;
 
 	private Role role;
+	
+	private long userId;
 
 	@Id
 	@Column(unique = true, nullable = false)
@@ -45,7 +47,6 @@ public class Income {
 	public String getName() {
 		return name;
 	}
-
 	@Column
 	@Temporal(TemporalType.DATE)
 	public Date getDate() {

@@ -75,6 +75,7 @@ public class CompanyFacade implements Facade {
 		income.setDescription(Description.Company_Add_Coupon);
 		income.setAmount(100);
 		income.setRole(userToUpdate.getRole());
+		income.setUserId(compId);
 		incomeService.storeIncome(income);
 
 		userToUpdate.setAmount(userToUpdate.getAmount() - 100);
@@ -143,6 +144,7 @@ public class CompanyFacade implements Facade {
 		income.setDate(new java.util.Date(System.currentTimeMillis()));
 		income.setDescription(Description.Company_update_Coupon);
 		income.setAmount(10);
+		income.setUserId(userId);
 		income.setRole(userRepository.getOne(userId).getRole());
 		incomeService.storeIncome(income);
 
@@ -206,7 +208,7 @@ public class CompanyFacade implements Facade {
 	}
 
 	public Collection<Income> viewIncomes() {
-		return incomeService.vievIncomeByCompany();
+		return incomeService.vievIncomeByCompany(compId);
 	}
 	
 	public List<Coupon> getAllCouponsOfAllCompanys() {
