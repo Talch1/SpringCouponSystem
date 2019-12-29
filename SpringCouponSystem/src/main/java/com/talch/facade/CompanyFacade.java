@@ -65,7 +65,10 @@ public class CompanyFacade implements Facade {
 
 	}
 
-	public List<Coupon> addCoupon(Coupon coupon, long compId) {
+	public List<Coupon> addCoupon(Coupon coupon, long compId) throws ExistEx {
+		if (couponRepository.findById(coupon.getId()).isPresent()){	
+			throw new ExistEx("This coupon is exist");
+	}else {
 		couponRepository.save(coupon);
 		Income income = new Income();
 		User userToUpdate = userRepository.getOne(compId);
@@ -84,7 +87,8 @@ public class CompanyFacade implements Facade {
 		userToUpdate.setCupons(coupons);
 		userRepository.save(userToUpdate);
 
-		return couponRepository.findAll();
+		return couponRepository.findAll();	
+	}
 	}
 
 	public List<Coupon> findAllCouponsByUser(long userId) {

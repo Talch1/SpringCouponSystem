@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import com.talch.beans.Coupon;
 import com.talch.beans.CouponType;
-import com.talch.beans.Income;
 import com.talch.beans.Role;
 import com.talch.beans.User;
 import com.talch.exeption.ExistEx;
@@ -43,6 +42,8 @@ public class AdminFacade implements Facade{
 	IncomeService incomeService;
 
 	Date date = new Date(System.currentTimeMillis());
+	Date dateMinusDayDate = new Date(System.currentTimeMillis()- (1000*60*60*24));
+	Date dateMinusFiveDyes = new Date(System.currentTimeMillis()- (1000*60*60*24*5));
 	Date datePlus5Days = new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 5));
 	Date datePlus1Min = new Date(System.currentTimeMillis() + (1000 * 60));
 
@@ -55,10 +56,13 @@ public class AdminFacade implements Facade{
 
 		userRepository.deleteAll();
 		couponRepository.deleteAll();
-
+         
+		
 		List<Coupon> coup = new ArrayList<>();
 
 		coup.add(new Coupon(1582, "1+1", date, datePlus5Days, 5, coupType, "just now!", 50,
+				"https://www.searchpng.com/wp-content/uploads/2019/09/Sale-PNG.jpg"));
+		coup.add(new Coupon(152, "3+1",dateMinusFiveDyes , dateMinusDayDate, 5, coupType, "wow!", 50,
 				"https://www.searchpng.com/wp-content/uploads/2019/09/Sale-PNG.jpg"));
 		coup.add(new Coupon(12, "2+1", date, datePlus5Days, 5, coupType2, "just today!", 82,
 				"https://www.searchpng.com/wp-content/uploads/2019/09/Sale-PNG.jpg"));
@@ -98,7 +102,6 @@ public class AdminFacade implements Facade{
 	}
 
 	public List<User> deleteUserById(long userId, Role role) {
-
 		userRepository.deleteById(userId);
 		List<User> allUsers = userRepository.findAll();
 		List<User> sorted = new ArrayList<User>();

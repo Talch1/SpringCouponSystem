@@ -2,7 +2,7 @@ package com.talch;
 
 import java.util.Map;
 
-
+import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,9 +30,9 @@ public class CouponSystem {
 	
 	@Autowired
 	private CustomerFacade customer;
-//	
-//	@Autowired
-//	private DailyCouponExpirationTask dayli;
+	
+	@Autowired
+	private DailyCouponExpirationTask dayli;
 
 	@Autowired
 	private UserRepository userRepository;
@@ -41,10 +41,10 @@ public class CouponSystem {
 	@Autowired
 	private Map<String, CustomSession> tokensMap;
 	
-//	@PostConstruct
-//	public void start() {
-//		dayli.run();
-//	}
+	@PostConstruct
+	public void start() {
+		dayli.start();
+	}
 
 	public Facade login(String userName, String password, Role role) throws ExistEx {
 		switch (role) {

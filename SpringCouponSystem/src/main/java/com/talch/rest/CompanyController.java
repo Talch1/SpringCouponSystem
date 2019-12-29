@@ -65,7 +65,7 @@ public class CompanyController {
 
 	// http://localhost:8080/company/createCoup
 	@PostMapping(value = "/createCoup")
-	public ResponseEntity<?> insertCoup(@RequestBody Coupon coup, @RequestHeader String token) {
+	public ResponseEntity<?> insertCoup(@RequestBody Coupon coup, @RequestHeader String token) throws ExistEx {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
