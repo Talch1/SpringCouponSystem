@@ -5,11 +5,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.talch.beans.Coupon;
@@ -25,25 +28,25 @@ import lombok.Data;
 @Service
 @Transactional
 @Data
-public class AdminFacade implements Facade{
-	
-	
+@RequiredArgsConstructor
+public class AdminFacade implements Facade {
+
+
 	private final long id = 1;
-	private String name= "Admin";
+
+	private String name = "Admin";
+
 	private Role role = Role.Admin;
-	
-	@Autowired
-	UserRepository userRepository;
 
-	@Autowired
-	CouponRepository couponRepository;
+	private final UserRepository userRepository;
 
-	@Autowired
-	IncomeService incomeService;
+	private final CouponRepository couponRepository;
+
+	private final IncomeService incomeService;
 
 	Date date = new Date(System.currentTimeMillis());
-	Date dateMinusDayDate = new Date(System.currentTimeMillis()- (1000*60*60*24));
-	Date dateMinusFiveDyes = new Date(System.currentTimeMillis()- (1000*60*60*24*5));
+	Date dateMinusDayDate = new Date(System.currentTimeMillis() - (1000 * 60 * 60 * 24));
+	Date dateMinusFiveDyes = new Date(System.currentTimeMillis() - (1000 * 60 * 60 * 24 * 5));
 	Date datePlus5Days = new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 5));
 	Date datePlus1Min = new Date(System.currentTimeMillis() + (1000 * 60));
 
@@ -53,16 +56,14 @@ public class AdminFacade implements Facade{
 
 	@PostConstruct
 	public void initDBCoup() {
-
 		userRepository.deleteAll();
 		couponRepository.deleteAll();
-         
-		
+
 		List<Coupon> coup = new ArrayList<>();
 
 		coup.add(new Coupon(1582, "1+1", date, datePlus5Days, 5, coupType, "just now!", 50,
 				"https://www.searchpng.com/wp-content/uploads/2019/09/Sale-PNG.jpg"));
-		coup.add(new Coupon(152, "3+1",dateMinusFiveDyes , dateMinusDayDate, 5, coupType, "wow!", 50,
+		coup.add(new Coupon(152, "3+1", dateMinusFiveDyes, dateMinusDayDate, 5, coupType, "wow!", 50,
 				"https://www.searchpng.com/wp-content/uploads/2019/09/Sale-PNG.jpg"));
 		coup.add(new Coupon(12, "2+1", date, datePlus5Days, 5, coupType2, "just today!", 82,
 				"https://www.searchpng.com/wp-content/uploads/2019/09/Sale-PNG.jpg"));
@@ -85,33 +86,28 @@ public class AdminFacade implements Facade{
 
 	// **************************user************************************
 
-	public Optional<User> insertUser(User user) throws ExistEx {
-		boolean check = false;
+	public ResponseEntity<?> insertUser(User user) {
 		List<User> users = userRepository.findAll();
-		for (User user2 : users) {
-			if (user.getId() == user2.getId() || user.getUserName().equals(user2.getUserName())) {
-				check = true;
-			}
+
+		if ((users.stream().filter(u -> u.getId() == user.getId()).findFirst().isPresent())
+				|| (users.stream().filter(u -> u.getUserName().equals(user.getUserName())).findFirst().isPresent())) {
+			return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("this id or name is exist");
 		}
-		if (check) {
-			throw new ExistEx("this id or name is exist");
-		} else {
 			userRepository.save(user);
-			return userRepository.findById(user.getId());
-		}
+			return ResponseEntity.status(HttpStatus.OK).body(userRepository.findById(user.getId()));
 	}
 
-	public List<User> deleteUserById(long userId, Role role) {
-		userRepository.deleteById(userId);
-		List<User> allUsers = userRepository.findAll();
-		List<User> sorted = new ArrayList<User>();
-		for (User user : allUsers) {
-			if (user.getRole().equals(role)) {
-				sorted.add(user);
-			}
-		}
-		return sorted;
-	}
+	public ResponseEntity<?> deleteUserById(long userId, Role role) {
+		Optional<User> user = userRepository.findById(userId);
+
+		if (user.isPresent()&& user.get().getRole().equals(Role.Customer)) {
+			userRepository.deleteById(userId);
+			List<User> allUsers = userRepository.findAll();
+
+			return ResponseEntity.status(HttpStatus.OK).body(allUsers.stream().
+					filter(u -> u.getRole().equals(Role.Customer)).collect(Collectors.toList()));
+		} return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not Exist"); }
+
 
 	public String deleteAllUsers(Role role) {
 		List<User> users = userRepository.findAll();
@@ -126,7 +122,10 @@ public class AdminFacade implements Facade{
 	}
 
 	public Optional<User> getUserById(long id) {
-		return userRepository.findById(id);
+		Optional<User> user = userRepository.findById(id);
+		if (user.isPresent()) {
+			return user;
+		}return  null;
 	}
 
 	public List<User> findAllUsers() {
@@ -155,15 +154,15 @@ public class AdminFacade implements Facade{
 		return compList;
 	}
 	
-	public User updateUser(long userIdtoUpdate, User user) {
-		User userToUpdate = userRepository.getOne(userIdtoUpdate);
-		userToUpdate.setUserName(user.getUserName());
-		userToUpdate.setEmail(user.getEmail());
-		userToUpdate.setPassword(user.getPassword());
-		userRepository.save(userToUpdate);
-		return userToUpdate;
-
-	}
+	public ResponseEntity<?> updateUser(long userIdtoUpdate, User user) {
+		Optional<User> userToUpdate = userRepository.findById(userIdtoUpdate);
+		if (userToUpdate.isPresent()&& userToUpdate.get().getRole().equals(Role.Customer)) {
+			userToUpdate.get().setUserName(user.getUserName());
+			userToUpdate.get().setEmail(user.getEmail());
+			userToUpdate.get().setPassword(user.getPassword());
+			userRepository.save(userToUpdate.get());
+			return ResponseEntity.status(HttpStatus.OK).body(userToUpdate.get());
+		}return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not Exist");}
 
 	public User getUserByNameAndPass(String name, String pass) {
 		return userRepository.findByUserNameAndPassword(name, pass);

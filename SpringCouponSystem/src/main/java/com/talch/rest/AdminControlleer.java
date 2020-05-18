@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,21 +31,21 @@ import com.talch.facade.AdminFacade;
 import com.talch.facade.CompanyFacade;
 
 @RestController
-@RequestMapping("/admin/")
+@RequiredArgsConstructor
+@RequestMapping("v1/admin/")
 public class AdminControlleer {
 
-	@Autowired
-	AdminFacade adminService;
-	@Autowired
-	CompanyFacade companyService;
-	@Autowired
-	CouponSystem system;
+	private final AdminFacade adminService;
+
+	private final CompanyFacade companyService;
+
+	private final CouponSystem system;
 
 	private CustomSession isActive(String token) {
 		return system.getTokensMap().get(token);
 	}
 
-	// http://localhost:8080/admin/logout
+	// http://localhost:8081/v1/admin//logout
 	@PostMapping(value = "/logout")
 	private void logout(@RequestHeader String token) {
 		system.getTokensMap().remove(token);
@@ -53,9 +54,10 @@ public class AdminControlleer {
 	
 //******************************Customer**********************************
 
-	// http://localhost:8080/admin/customerCreate
+	// http://localhost:8081/v1/admin//customerCreate
+
 	@PostMapping(value = "/customerCreate")
-	public ResponseEntity<?> insertCust(@RequestBody User customer, @RequestHeader String token) throws ExistEx {
+	public ResponseEntity<?> customerCreate(@RequestBody User customer, @RequestHeader String token) throws ExistEx {
 		CustomSession customSession = isActive(token);
 
 		if (customSession != null) {
@@ -63,35 +65,32 @@ public class AdminControlleer {
 			customer.setRole(Role.Customer);
 			customer.setAmount(1000);
 			customer.setEmail(null);
-			return ResponseEntity.status(HttpStatus.OK).body(adminService.insertUser(customer));
+			return adminService.insertUser(customer);
 		}
-		return new ResponseEntity(HttpStatus.BAD_REQUEST);
+		return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Session is null");
 	}
 
-	// http://localhost:8080/admin/deleteCust/{custId}}
+	// http://localhost:8081/v1/admin/deleteCust/{custId}}
 	@DeleteMapping(value = "/deleteCust/{custId}")
 	public ResponseEntity<?> deleteCustomer(@PathVariable long custId, @RequestHeader String token) {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
-			if (adminService.getUserById(custId).get().getRole().equals(Role.Customer)) {
-				return ResponseEntity.status(HttpStatus.OK).body(adminService.deleteUserById(custId, Role.Customer));
-			}
+				return adminService.deleteUserById(custId, Role.Customer);
 		}
-		return new ResponseEntity(HttpStatus.BAD_REQUEST);
+		return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Session is null");
 	}
 
-	// http://localhost:8080/admin/custUpdate/{id}
+	// http://localhost:8081/v1/admin/custUpdate/{id}
 	@PutMapping(value = "/custUpdate/{id}")
 	public ResponseEntity<?> updateCustomer1(@PathVariable long id, @RequestBody User customer,
 			@RequestHeader String token) {
 		CustomSession customSession = isActive(token);
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
-			if (adminService.updateUser(id, customer).getRole().equals(Role.Customer)) {
-				adminService.updateUser(id, customer);
-				return ResponseEntity.status(HttpStatus.OK).body(adminService.getUserById(customer.getId()));
-			}
+
+				return adminService.updateUser(id, customer);
+
 		}
 		return new ResponseEntity(HttpStatus.BAD_REQUEST);
 	}
@@ -159,20 +158,20 @@ public class AdminControlleer {
 		return new ResponseEntity(HttpStatus.BAD_REQUEST);
 	}
 
-	// http://localhost:8080/admin/companyUpdate
-	@PutMapping(value = "/companyUpdate/{id}")
-	public ResponseEntity<?> updateCompany1(@PathVariable long id, @RequestBody User company,
-			@RequestHeader String token) {
-		CustomSession customSession = isActive(token);
-		if (customSession != null) {
-			customSession.setLastAccessed(System.currentTimeMillis());
-			if (adminService.updateUser(id, company).getRole().equals(Role.Company)) {
-				adminService.updateUser(id, company);
-				return ResponseEntity.status(HttpStatus.OK).body(adminService.getUserById(company.getId()));
-			}
-		}
-		return new ResponseEntity(HttpStatus.BAD_REQUEST);
-	}
+//	// http://localhost:8080/admin/companyUpdate
+//	@PutMapping(value = "/companyUpdate/{id}")
+//	public ResponseEntity<?> updateCompany1(@PathVariable long id, @RequestBody User company,
+//			@RequestHeader String token) {
+//		CustomSession customSession = isActive(token);
+//		if (customSession != null) {
+//			customSession.setLastAccessed(System.currentTimeMillis());
+//			if (adminService.updateUser(id, company).getRole().equals(Role.Company)) {
+//				adminService.updateUser(id, company);
+//				return ResponseEntity.status(HttpStatus.OK).body(adminService.getUserById(company.getId()));
+//			}
+//		}
+//		return new ResponseEntity(HttpStatus.BAD_REQUEST);
+//	}
 
 	// http://localhost:8080/admin/getCompByID/{compId}
 	@GetMapping(value = "/getCompByID/{compId}")
