@@ -8,7 +8,11 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import com.talch.utils.Utils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.talch.beans.Coupon;
@@ -25,28 +29,31 @@ import lombok.Data;
 @Service
 @Transactional
 @Data
+@RequiredArgsConstructor
 public class CompanyFacade implements Facade {
 
-	@Autowired
-	UserRepository userRepository;
 
-	@Autowired
-	CouponRepository couponRepository;
+	private final UserRepository userRepository;
 
-	@Autowired
-	IncomeService incomeService;
+	private final CouponRepository couponRepository;
+
+	private final IncomeService incomeService;
+
+	private final Utils utils;
 
 	private long compId;
 	private String compName;
 	private Role role = Role.Company;
 
-	public void addCouponToUser(long userId, long coupId) {
-		if ((couponRepository.getOne(coupId) != null) && (userRepository.getOne(userId) != null)) {
-			Coupon coupon = couponRepository.getOne(coupId);
-			User userToUpdate = userRepository.getOne(userId);
-			List<Coupon> coupons = (List<Coupon>) userToUpdate.getCupons();
-			coupons.add(coupon);
+	public ResponseEntity addCouponToUser(long userId, long coupId) {
+		Optional<Coupon> coupon = couponRepository.findById(coupId);
+		Optional<User> userToUpdate = userRepository.findById(userId);
+		if (coupon.isPresent() && userToUpdate.isPresent()) {
+			List<Coupon> coupons = (List<Coupon>) userToUpdate.get().getCupons();
+			coupons.add(coupon.get());
+			return ResponseEntity.status(HttpStatus.OK).body(coupons);
 		}
+		return utils.getResponseEntitySesionNull();
 	}
 
 	public Optional<Coupon> findCoupById(long id) {
@@ -115,11 +122,10 @@ public class CompanyFacade implements Facade {
 
 	}
 
-	public Collection<Coupon> getAllcouponsByUserId(long id) {
-		Optional<User> user = userRepository.findById(id);
-		List<Coupon> coupons = (List<Coupon>) user.get().getCupons();
-		return coupons;
-
+	public ResponseEntity getAllcouponsByUserId(long id,Role role) {
+ if ()
+		Collection <Coupon> coupons = userRepository.findById(id).get().getCupons();
+		return ResponseEntity.status(HttpStatus.OK).body(coupons);
 	}
 
 	public List<Coupon> deleteCouponsByUser(long userId) {

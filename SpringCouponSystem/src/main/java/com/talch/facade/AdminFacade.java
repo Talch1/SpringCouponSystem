@@ -6,10 +6,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
+import com.talch.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +45,11 @@ public class AdminFacade implements Facade {
 	private final CouponRepository couponRepository;
 
 	private final IncomeService incomeService;
+
+	private final Utils utils;
+
+	private final  ResponseEntity responseEntitySomesingWrong= ResponseEntity.status(HttpStatus.BAD_REQUEST)
+			.body("Somesing Wrong");
 
 	Date date = new Date(System.currentTimeMillis());
 	Date dateMinusDayDate = new Date(System.currentTimeMillis() - (1000 * 60 * 60 * 24));
@@ -86,64 +93,60 @@ public class AdminFacade implements Facade {
 
 	// **************************user************************************
 
-	public ResponseEntity<?> insertUser(User user) {
+	public ResponseEntity insertUser(User user) {
 		List<User> users = userRepository.findAll();
 
 		if ((users.stream().filter(u -> u.getId() == user.getId()).findFirst().isPresent())
 				|| (users.stream().filter(u -> u.getUserName().equals(user.getUserName())).findFirst().isPresent())) {
-			return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("this id or name is exist");
+			return  responseEntitySomesingWrong;
 		}
 			userRepository.save(user);
 			return ResponseEntity.status(HttpStatus.OK).body(userRepository.findById(user.getId()));
 	}
 
-	public ResponseEntity<?> deleteUserById(long userId, Role role) {
+	public ResponseEntity deleteUserById(long userId, Role role) {
 		Optional<User> user = userRepository.findById(userId);
 
-		if (user.isPresent()&& user.get().getRole().equals(Role.Customer)) {
+		if (user.isPresent()&& utils.checkRole(userId,role)){
 			userRepository.deleteById(userId);
 			List<User> allUsers = userRepository.findAll();
 
 			return ResponseEntity.status(HttpStatus.OK).body(allUsers.stream().
-					filter(u -> u.getRole().equals(Role.Customer)).collect(Collectors.toList()));
-		} return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not Exist"); }
-
-
-	public String deleteAllUsers(Role role) {
-		List<User> users = userRepository.findAll();
-		for (User user : users) {
-			if (!user.getRole().equals(role)) {
-				users.remove(user);
-			}
-		}
-
-		userRepository.deleteAll(users);
-		return "All Customers Deleted ";
+					filter(u -> u.getRole().equals(role)).collect(Collectors.toList()));
+		} return responseEntitySomesingWrong;
 	}
 
-	public Optional<User> getUserById(long id) {
-		Optional<User> user = userRepository.findById(id);
-		if (user.isPresent()) {
-			return user;
-		}return  null;
+	public ResponseEntity<String> deleteAllUsers(Role role) {
+		List<User> users = userRepository.findAll().stream().
+				filter(user -> user.getRole().equals(role)).
+				collect(Collectors.toList());
+		userRepository.deleteAll(users);
+		return ResponseEntity.status(HttpStatus.OK).
+				body("All users was delete");
+	}
+
+	public ResponseEntity getUserById(long id,Role role) {
+		if (utils.checkRole(id, role)) {
+			Optional<User> user = userRepository.findById(id);
+			if (user.isPresent()) {
+				return ResponseEntity.status(HttpStatus.OK).body(user);
+			}
+		}
+		return responseEntitySomesingWrong;
 	}
 
 	public List<User> findAllUsers() {
 		return userRepository.findAll();
 	}
 
-	public List<User> findAllCust(){
-		List<User> users = findAllUsers();
-		List<User> customersList = new ArrayList<User>();
-		for (User user : users) {
-			if (user.getRole().equals(Role.Customer)) {
-				customersList.add(user);
-			}
-		}
-		return customersList;
+	public ResponseEntity findAllCust(){
+		return  ResponseEntity.status(HttpStatus.OK)
+				.body(userRepository.findAll().stream().
+						filter(user -> user.getRole().equals(Role.Customer)).
+						collect(Collectors.toList()));
 	}
 	
-	public List<User> findAllComp(){
+	public ResponseEntity findAllComp(){
 		List<User> users = findAllUsers();
 		List<User> compList = new ArrayList<User>();
 		for (User user : users) {
@@ -151,18 +154,18 @@ public class AdminFacade implements Facade {
 				compList.add(user);
 			}
 		}
-		return compList;
+		return ResponseEntity.status(HttpStatus.OK)userRepository.findAll().stream().filter(user -> user.getRole().equals(Role.Company));
 	}
 	
-	public ResponseEntity<?> updateUser(long userIdtoUpdate, User user) {
+	public ResponseEntity<?> updateUser(long userIdtoUpdate, User user,Role role) {
 		Optional<User> userToUpdate = userRepository.findById(userIdtoUpdate);
-		if (userToUpdate.isPresent()&& userToUpdate.get().getRole().equals(Role.Customer)) {
+		if (utils.checkRole(userIdtoUpdate,role)) {
 			userToUpdate.get().setUserName(user.getUserName());
 			userToUpdate.get().setEmail(user.getEmail());
 			userToUpdate.get().setPassword(user.getPassword());
 			userRepository.save(userToUpdate.get());
-			return ResponseEntity.status(HttpStatus.OK).body(userToUpdate.get());
-		}return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not Exist");}
+			return ResponseEntity.status(HttpStatus.OK).body(userRepository.findById(userIdtoUpdate));
+		}return responseEntitySomesingWrong;}
 
 	public User getUserByNameAndPass(String name, String pass) {
 		return userRepository.findByUserNameAndPassword(name, pass);
