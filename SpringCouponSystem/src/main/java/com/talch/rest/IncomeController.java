@@ -34,13 +34,13 @@ public class IncomeController {
 		return system.getTokensMap().get(token);
 	}
 
-//http://localhost:8080/income/store
+//http://localhost:8081/income/store
 	@PostMapping(value = "/store")
 	public void storeIncome(@RequestBody Income income) {
 		incomeService.storeIncome(income);
 	}
 
-//http://localhost:8080/income/allIncome
+//http://localhost:8081/income/allIncome
 	@GetMapping(value = "/anllIncome")
 	public ResponseEntity<?> viewAllIncome(@RequestHeader String token) {
 		CustomSession customSession = isActive(token);
@@ -55,7 +55,7 @@ public class IncomeController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-//http://localhost:8080/income/allCustIncome
+//http://localhost:8081/income/allCustIncome
 	@GetMapping(value = "/allCustIncome/{custId}")
 	public ResponseEntity<?>  vievIncomeByCustomer(@PathVariable long custId,@RequestHeader String token) {
 		CustomSession customSession = isActive(token);
@@ -70,7 +70,7 @@ public class IncomeController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-//http://localhost:8080/income/allCompIncome
+//http://localhost:8081/income/allCompIncome
 	@GetMapping(value = "/allCompIncome")
 	public ResponseEntity<?> vievIncomeByCompany(@RequestHeader String token) {
 		CustomSession customSession = isActive(token);

@@ -12,9 +12,11 @@ import org.springframework.stereotype.Repository;
 
 import com.talch.beans.User;
 
+import java.util.Optional;
+
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-	public User findByUserNameAndPassword(String userName,String password);
+	public Optional<User> findByUserNameAndPassword(String userName, String password);
 
 
 

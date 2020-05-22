@@ -128,7 +128,7 @@ public class AdminControlleer {
 	// http://localhost:8081/v1/admin/companyCreate
 	@PostMapping(value = "/companyCreate")
 	public ResponseEntity<?> companyCreate(@RequestBody User company, @RequestHeader String token) {
-		CustomSession customSession = utils.isActive(token));
+		CustomSession customSession = utils.isActive(token);
 		if (customSession != null) {
 			customSession.setLastAccessed(System.currentTimeMillis());
 			company.setRole(Role.Company);
@@ -210,7 +210,7 @@ public class AdminControlleer {
 		return utils.getResponseEntitySesionNull();
 	}
 
-	// http://localhost:8081/admin/addCouponToComp
+	// http://localhost:8081/v1/admin/addCouponToComp
 	@PutMapping(value = "/addCouponToComp/{userId}")
 	public ResponseEntity<?> addCouponsToComp(@PathVariable long userId, @RequestBody long couponId,
 			@RequestHeader String token) {
@@ -231,108 +231,98 @@ public class AdminControlleer {
 				return ResponseEntity.status(HttpStatus.OK).body(companyService.getAllcouponsByUserId(id,Role.Company));
 
 		}
-		return new ResponseEntity(HttpStatus.BAD_REQUEST);
+		return utils.getResponseEntitySesionNull();
 	}
 
 	// ***********************Coupon*****************************************
 
-	// http://localhost:8080/admin/createCoup
+	// http://localhost:8081/v1/admin/createCoup
 	@PostMapping(value = "/createCoup")
 	public ResponseEntity<?> insertCoup(@RequestBody Coupon coup, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
 		if (customSession != null) {
-			if (adminService.findCoupById(coup.getId()).isPresent()) {
-				return new ResponseEntity(HttpStatus.NOT_FOUND);
-			}
-			adminService.addCoupon(coup);
-			return ResponseEntity.status(HttpStatus.OK).body(adminService.findAllCoup());
+			return adminService.addCoupon(coup);
 		}
-		return new ResponseEntity(HttpStatus.BAD_REQUEST);
+		return utils.getResponseEntitySesionNull();
 	}
 
-	// http://localhost:8080/admin/getCoupByID/{id}
+	// http://localhost:8081/v1/admin/getCoupByID/{id}
 	@GetMapping(value = "/getCoupByID/{id}")
 	public ResponseEntity<?> findById2(@PathVariable Long id, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
 		if (customSession != null) {
-			return ResponseEntity.status(HttpStatus.OK).body(adminService.findCoupById(id));
+			return adminService.findCoupById(id);
 		}
-		return new ResponseEntity(HttpStatus.BAD_REQUEST);
+		return utils.getResponseEntitySesionNull();
 	}
 
-	// http://localhost:8080/admin/getCoupons
+	// http://localhost:8081/v1/admin/getCoupons
 	@GetMapping(value = "/getCoupons")
 	public ResponseEntity<?> getAllCoupons(@RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
 		if (customSession != null) {
-
-			return ResponseEntity.status(HttpStatus.OK).body(adminService.findAllCoup());
+			return adminService.findAllCoup();
 		}
-		return new ResponseEntity(HttpStatus.BAD_REQUEST);
+		return utils.getResponseEntitySesionNull();
 	}
 
-	// http://localhost:8080/admin/deleteCoup/{id}
+	// http://localhost:8081/v1/admin/deleteCoup/{id}
 	@DeleteMapping(value = "/deleteCoup/{id}")
 	public ResponseEntity<?> deleteCoup(@PathVariable Long id, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
 		if (customSession != null) {
-
-			return ResponseEntity.status(HttpStatus.OK).body(adminService.deleteCoupon(id));
+			return adminService.deleteCoupon(id);
 		}
-		return new ResponseEntity(HttpStatus.BAD_REQUEST);
+		return utils.getResponseEntitySesionNull();
 	}
 
-	// http://localhost:8080/admin/deleteCoup/All
+	// http://localhost:8081/v1/admin/deleteCoup/All
 	@DeleteMapping(value = "/deleteCoup/All")
-	public ResponseEntity<?> deleteCoupons(@RequestHeader String token) {
+	public ResponseEntity<String> deleteCoupons(@RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
 		if (customSession != null) {
-			adminService.deleteCoupons();
-			return ResponseEntity.status(HttpStatus.OK).body(adminService.findAllCoup());
+			return adminService.deleteCoupons();
 		}
-		return new ResponseEntity(HttpStatus.BAD_REQUEST);
+	return utils.getResponseEntitySesionNull();
 	}
 
-	// http://localhost:8080/admin/coupUpdate
+	// http://localhost:8081/v1/admin/coupUpdate
 	@PutMapping(value = "/coupUpdate")
 	public ResponseEntity<?> updateCoupon(@RequestBody Coupon coupon, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
 		if (customSession != null) {
-
-			adminService.updateCouponAdmin(coupon);
-
-			return ResponseEntity.status(HttpStatus.OK).body(coupon);
+			return adminService.updateCouponAdmin(coupon);
 		}
-		return new ResponseEntity(HttpStatus.BAD_REQUEST);
+	return utils.getResponseEntitySesionNull();
 	}
 
-	// http://localhost:8080/admin/getAllCoupByType
+	// http://localhost:8081/v1/admin/getAllCoupByType
 	@GetMapping(value = "/getAllCoupByType/{type}")
 	public ResponseEntity<?> getAllCouponsByType(@PathVariable CouponType type, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
 		if (customSession != null) {
-			return ResponseEntity.status(HttpStatus.OK).body(adminService.getCouponByType(type));
+			return adminService.getCouponByType(type);
 		}
-		return new ResponseEntity(HttpStatus.BAD_REQUEST);
+	return utils.getResponseEntitySesionNull();
 	}
 
-	// http://localhost:8080/admin/getAllCoupByDate
+	// http://localhost:8081/v1/admin/getAllCoupByDate
 	@GetMapping(value = "/getAllCoupByDate/{date}")
 	public ResponseEntity<?> getAllCouponsByDate(@PathVariable Date date, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
 		if (customSession != null) {
-			return ResponseEntity.status(HttpStatus.OK).body(adminService.getCouponByDate(date));
+			return adminService.getCouponByDate(date);
 		}
-		return new ResponseEntity(HttpStatus.BAD_REQUEST);
+	return utils.getResponseEntitySesionNull();
 	}
 
-	// http://localhost:8080/admin/getAllCoupByPrice
+	// http://localhost:8081/v1/admin/getAllCoupByPrice
 	@GetMapping(value = "/getAllCoupByPrice/{price1}")
 	public ResponseEntity<?> getCouponWhenPriceBetwenPrice(@PathVariable Double price1, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
 		if (customSession != null) {
-			return ResponseEntity.status(HttpStatus.OK).body(adminService.getCouponWhenPriceBetwenPrice(price1));
+			return adminService.getCouponWhenPriceBetwenPrice(price1);
 		}
-		return new ResponseEntity(HttpStatus.BAD_REQUEST);
+	return utils.getResponseEntitySesionNull();
 	}
 }

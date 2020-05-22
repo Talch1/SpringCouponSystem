@@ -24,7 +24,7 @@ public class LogginController {
 	@Autowired
 	private CouponSystem system;
 
-//http://localhost:8080/login/logging
+//http://localhost:8081/login/logging
 	@PostMapping(value = "/logging/{username}/{password}/{type}")
 
 	public ResponseEntity<?> login(@PathVariable("username") String userName, @PathVariable("password") String password,

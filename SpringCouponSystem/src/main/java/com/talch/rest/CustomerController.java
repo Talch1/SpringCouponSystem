@@ -38,19 +38,19 @@ public class CustomerController {
 		return system.getTokensMap().get(token);
 	}
 
-	// http://localhost:8080/admin/logout
+	// http://localhost:8081/v1/admin/logout
 	@PostMapping(value = "/logout")
 	private void logout(@RequestHeader String token) {
 		system.getTokensMap().remove(token);
 	}
 
-	// http://localhost:8080/customer/seeAllCoupons
+	// http://localhost:8081/customer/seeAllCoupons
 	@GetMapping(value = "/seeAllCoupons")
 	public Collection<Coupon> seeAllCoup() {
 		return customerService.getAllCouponsOfAllCompanys();
 	}
 
-	// http://localhost:8080/customer/addCouponToCust/{coupId}
+	// http://localhost:8081/customer/addCouponToCust/{coupId}
 	@PutMapping(value = "/addCouponToCust/{coupId}")
 	public ResponseEntity<?> addCoupon(@RequestHeader String token, @PathVariable long coupId) throws ExistEx {
 		CustomSession customSession = isActive(token);
@@ -65,7 +65,7 @@ public class CustomerController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// http://localhost:8080/customer/getCustCoup
+	// http://localhost:8081/customer/getCustCoup
 	@GetMapping(value = "/getCustCoup")
 	public ResponseEntity<?> getCustCoupons(@RequestHeader String token) {
 		CustomSession customSession = isActive(token);
@@ -80,7 +80,7 @@ public class CustomerController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// http://localhost:8080/customer/getCustCoupByID/{coupId}
+	// http://localhost:8081/customer/getCustCoupByID/{coupId}
 	@GetMapping(value = "/getCustCoupByID/{coupId}")
 	public ResponseEntity<?> findCustCoupById(@RequestHeader String token, @PathVariable long coupId) throws ExistEx {
 		CustomSession customSession = isActive(token);
@@ -92,7 +92,7 @@ public class CustomerController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// http://localhost:8080/customer/findCustCoupByType/{type}
+	// http://localhost:8081/customer/findCustCoupByType/{type}
 	@GetMapping(value = "/findCustCoupByType/{type}")
 	public ResponseEntity<?> findCustCoupByType(@RequestHeader String token, @PathVariable CouponType type)
 			throws ExistEx {
@@ -105,7 +105,7 @@ public class CustomerController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// http://localhost:8080/customer/findCustCoupByDate/{date}
+	// http://localhost:8081/customer/findCustCoupByDate/{date}
 	@GetMapping(value = "/findCustCoupByDate/{date}")
 	public ResponseEntity<?> findCustCoupByDate(@RequestHeader String token, @PathVariable Date date) throws ExistEx {
 		CustomSession customSession = isActive(token);
@@ -117,7 +117,7 @@ public class CustomerController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// http://localhost:8080/customer/findCustCoupByPrice/{price}
+	// http://localhost:8081/customer/findCustCoupByPrice/{price}
 	@GetMapping(value = "/findCustCoupByPrice/{price}")
 	public ResponseEntity<?> findCustCoupByPrice(@RequestHeader String token, @PathVariable double price)
 			throws ExistEx {

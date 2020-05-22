@@ -53,7 +53,7 @@ public class CompanyFacade implements Facade {
 			coupons.add(coupon.get());
 			return ResponseEntity.status(HttpStatus.OK).body(coupons);
 		}
-		return utils.getResponseEntitySesionNull();
+		return EntitySesionNull();
 	}
 
 	public Optional<Coupon> findCoupById(long id) {

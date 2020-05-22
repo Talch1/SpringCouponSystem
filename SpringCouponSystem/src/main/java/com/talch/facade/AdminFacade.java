@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
@@ -154,7 +153,8 @@ public class AdminFacade implements Facade {
 				compList.add(user);
 			}
 		}
-		return ResponseEntity.status(HttpStatus.OK)userRepository.findAll().stream().filter(user -> user.getRole().equals(Role.Company));
+		return ResponseEntity.status(HttpStatus.OK).body(
+				userRepository.findAll().stream().filter(user -> user.getRole().equals(Role.Company)));
 	}
 	
 	public ResponseEntity<?> updateUser(long userIdtoUpdate, User user,Role role) {
@@ -167,15 +167,22 @@ public class AdminFacade implements Facade {
 			return ResponseEntity.status(HttpStatus.OK).body(userRepository.findById(userIdtoUpdate));
 		}return responseEntitySomesingWrong;}
 
-	public User getUserByNameAndPass(String name, String pass) {
-		return userRepository.findByUserNameAndPassword(name, pass);
+	public ResponseEntity getUserByNameAndPass(String name, String pass,Role role) {
+		Optional<User> user = userRepository.findByUserNameAndPassword(name, pass);
+		if (utils.checkRole(user.get().getId(),role)&&user.isPresent()){
+			return ResponseEntity.status(HttpStatus.OK).body(user.get());
+		}
+		return utils.getResponseEntitySomesingWrong() ;
 	}
 
 	// **************************CouponS************************************
 
-	public List<Coupon> addCoupon(Coupon coupon) {
-		couponRepository.save(coupon);
-		return couponRepository.findAll();
+	public ResponseEntity addCoupon(Coupon coupon) {
+		if (userRepository.findById(coupon.getId()).isPresent()) {
+			return utils.getResponseEntitySomesingWrong();
+		}
+			couponRepository.save(coupon);
+		return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findAll());
 	}
 
 	public Collection<Coupon> deleteCouponByUser(long userId, long coupId) {
@@ -191,13 +198,10 @@ public class AdminFacade implements Facade {
 		user.setCupons(list2);
 		userRepository.save(user);
 		return list2;
-
 	}
-
-	public List<Coupon> deleteCoupon(long coupId) {
+	public ResponseEntity deleteCoupon(long coupId) {
 		couponRepository.deleteById(coupId);
-		return couponRepository.findAll();
-
+		return ResponseEntity.status(HttpStatus.OK).body( couponRepository.findAll());
 	}
 
 	public List<Coupon> findAllCouponsByUser(long userId) {
@@ -215,16 +219,15 @@ public class AdminFacade implements Facade {
 		return coupon2;
 	}
 
-	public Coupon updateCouponAdmin(Coupon coupon) {
+	public ResponseEntity updateCouponAdmin(Coupon coupon) {
 
-		Coupon coupToUpdate = couponRepository.getOne(coupon.getId());
-		coupToUpdate.setEndDate(coupon.getEndDate());
-
-		coupToUpdate.setPrice(coupon.getPrice());
-		couponRepository.save(coupToUpdate);
-
-		return couponRepository.getOne(coupon.getId());
-
+		Optional<Coupon> coupToUpdate = couponRepository.findById(coupon.getId());
+		if (coupToUpdate.isPresent()){
+			coupToUpdate.get().setEndDate(coupon.getEndDate());
+			coupToUpdate.get().setPrice(coupon.getPrice());
+			couponRepository.save(coupToUpdate.get());
+			return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findById(coupon.getId()).get());
+		} return  utils.getResponseEntitySomesingWrong();
 	}
 
 	public Coupon updateCoupon(Coupon coupon, long userId) throws ExistEx {
@@ -255,37 +258,35 @@ public class AdminFacade implements Facade {
 		return (List<Coupon>) user.get().getCupons();
 	}
 
-	public String deleteCoupons() {
+	public ResponseEntity<String> deleteCoupons() {
 		couponRepository.deleteAll();
-		return "All Customers Deleted ";
+		return ResponseEntity.status(HttpStatus.OK).body("All Coupons Deleted");
 	}
 
-	public Optional<Coupon> findCoupById(long id) {
-		return couponRepository.findById(id);
+	public ResponseEntity findCoupById(long id) {
+		Optional<Coupon> coupon = couponRepository.findById(id);
+		if (coupon.isPresent()) {
+			return ResponseEntity.status(HttpStatus.OK).body(coupon);
+		}
+		return  utils.getResponseEntitySomesingWrong();
 	}
 
-	public List<Coupon> findAllCoup() {
-		return couponRepository.findAll();
+	public ResponseEntity findAllCoup() {
+		return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findAll());
 	}
 
-	public List<Coupon> getCouponByType(CouponType type) {
-		return couponRepository.findByType(type);
+	public ResponseEntity<List<Coupon>>getCouponByType(CouponType type) {
+		return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findByType(type));
 	}
 
-	public List<Coupon> getCouponByDate(Date date) {
+	public ResponseEntity<List<Coupon>> getCouponByDate(Date date) {
 
-		return couponRepository.findByEndDateBefore(date);
-
-	}
-
-	public List<Coupon> getCouponWhenPriceBetwenPrice(Double price1) {
-		return couponRepository.findByPriceLessThan(price1);
+		return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findByEndDateBefore(date));
 
 	}
 
-	public long getId() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	public ResponseEntity<List<Coupon>> getCouponWhenPriceBetwenPrice(Double price1) {
+		return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findByPriceLessThan(price1));
 
+	}
 }
