@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.talch.facade.Facade;
 import com.talch.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,12 @@ public class AdminControlleer {
 
 	private final Utils utils;
 
-
+	private boolean checkSession(CustomSession customSession) {
+		if (companyService != null && customSession.getFacade().getRole().equals(Role.Admin)) {
+		return true;
+	}
+		return false;
+}
 	// http://localhost:8081/v1/admin//logout
 	@PostMapping(value = "/logout")
 	private void logout(@RequestHeader String token) {
@@ -57,7 +63,7 @@ public class AdminControlleer {
 	public ResponseEntity<?> customerCreate(@RequestBody User customer, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
 
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			customSession.setLastAccessed(System.currentTimeMillis());
 			customer.setRole(Role.Customer);
 			customer.setAmount(1000);
@@ -71,7 +77,7 @@ public class AdminControlleer {
 	@DeleteMapping(value = "/deleteCust/{custId}")
 	public ResponseEntity<?> deleteCustomer(@PathVariable long custId, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			customSession.setLastAccessed(System.currentTimeMillis());
 			return adminService.deleteUserById(custId, Role.Customer);
 		}
@@ -83,7 +89,7 @@ public class AdminControlleer {
 	public ResponseEntity<?> updateCustomer1(@PathVariable long id, @RequestBody User customer,
 											 @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			customSession.setLastAccessed(System.currentTimeMillis());
 			return adminService.updateUser(id, customer, Role.Customer);
 		}
@@ -94,7 +100,7 @@ public class AdminControlleer {
 	@GetMapping(value = "/getCustByID/{custId}")
 	public ResponseEntity<?> findById(@PathVariable long custId, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			customSession.setLastAccessed(System.currentTimeMillis());
 			return adminService.getUserById(custId,Role.Customer);
 		}
@@ -105,7 +111,7 @@ public class AdminControlleer {
 	@GetMapping(value = "/getCustomers")
 	public ResponseEntity<?> getAllCustomers(@RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			customSession.setLastAccessed(System.currentTimeMillis());
 			return adminService.findAllCust();
 		}
@@ -116,7 +122,7 @@ public class AdminControlleer {
 	@DeleteMapping(value = "/deleteCust/All")
 	public ResponseEntity<String> deleteCustomers(@RequestBody Role role, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			customSession.setLastAccessed(System.currentTimeMillis());
 			return adminService.deleteAllUsers(role);
 		}
@@ -129,7 +135,7 @@ public class AdminControlleer {
 	@PostMapping(value = "/companyCreate")
 	public ResponseEntity<?> companyCreate(@RequestBody User company, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			customSession.setLastAccessed(System.currentTimeMillis());
 			company.setRole(Role.Company);
 			company.setAmount(100000);
@@ -142,7 +148,7 @@ public class AdminControlleer {
 	@DeleteMapping(value = "/deleteComp/{compId}")
 	public ResponseEntity<?> deleteCompany(@PathVariable long compId, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			customSession.setLastAccessed(System.currentTimeMillis());
 
 			return adminService.deleteUserById(compId, Role.Company);
@@ -156,7 +162,7 @@ public class AdminControlleer {
 	public ResponseEntity<?> companyUpdate(@PathVariable long id, @RequestBody User company,
 											@RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			customSession.setLastAccessed(System.currentTimeMillis());
 			return adminService.updateUser(id, company, Role.Company);
 		}
@@ -167,7 +173,7 @@ public class AdminControlleer {
 	@GetMapping(value = "/getCompByID/{compId}")
 	public ResponseEntity<?> getCompByID(@PathVariable long compId, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			customSession.setLastAccessed(System.currentTimeMillis());
 				return adminService.getUserById(compId,Role.Company);
 		}
@@ -178,7 +184,7 @@ public class AdminControlleer {
 	@GetMapping(value = "/getCompanys")
 	public ResponseEntity<?> companys(@RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			customSession.setLastAccessed(System.currentTimeMillis());
 			return adminService.findAllComp();
 		}
@@ -189,7 +195,7 @@ public class AdminControlleer {
 	@DeleteMapping(value = "/deleteComp/All")
 	public ResponseEntity<String> deleteCompanys(Role role, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			customSession.setLastAccessed(System.currentTimeMillis());
 			return adminService.deleteAllUsers(role);
 		}
@@ -202,7 +208,7 @@ public class AdminControlleer {
 	public ResponseEntity<?> getCompanyByNameAndPass(@RequestParam String name, @RequestParam String pass,
 			@RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			customSession.setLastAccessed(System.currentTimeMillis());
 
 			return adminService.getUserByNameAndPass(name, pass,Role.Company);
@@ -215,7 +221,7 @@ public class AdminControlleer {
 	public ResponseEntity<?> addCouponsToComp(@PathVariable long userId, @RequestBody long couponId,
 			@RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			customSession.setLastAccessed(System.currentTimeMillis());
 			return companyService.addCouponToUser(userId, couponId);
 		}
@@ -226,7 +232,7 @@ public class AdminControlleer {
 	@GetMapping(value = "/getCompCoupons/{id}")
 	public ResponseEntity<?> getCompCoupons(@PathVariable long id, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			customSession.setLastAccessed(System.currentTimeMillis());
 				return ResponseEntity.status(HttpStatus.OK).body(companyService.getAllcouponsByUserId(id,Role.Company));
 
@@ -240,7 +246,7 @@ public class AdminControlleer {
 	@PostMapping(value = "/createCoup")
 	public ResponseEntity<?> insertCoup(@RequestBody Coupon coup, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			return adminService.addCoupon(coup);
 		}
 		return utils.getResponseEntitySesionNull();
@@ -250,7 +256,7 @@ public class AdminControlleer {
 	@GetMapping(value = "/getCoupByID/{id}")
 	public ResponseEntity<?> findById2(@PathVariable Long id, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			return adminService.findCoupById(id);
 		}
 		return utils.getResponseEntitySesionNull();
@@ -260,7 +266,7 @@ public class AdminControlleer {
 	@GetMapping(value = "/getCoupons")
 	public ResponseEntity<?> getAllCoupons(@RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			return adminService.findAllCoup();
 		}
 		return utils.getResponseEntitySesionNull();
@@ -270,7 +276,7 @@ public class AdminControlleer {
 	@DeleteMapping(value = "/deleteCoup/{id}")
 	public ResponseEntity<?> deleteCoup(@PathVariable Long id, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			return adminService.deleteCoupon(id);
 		}
 		return utils.getResponseEntitySesionNull();
@@ -280,7 +286,7 @@ public class AdminControlleer {
 	@DeleteMapping(value = "/deleteCoup/All")
 	public ResponseEntity<String> deleteCoupons(@RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			return adminService.deleteCoupons();
 		}
 	return utils.getResponseEntitySesionNull();
@@ -290,7 +296,7 @@ public class AdminControlleer {
 	@PutMapping(value = "/coupUpdate")
 	public ResponseEntity<?> updateCoupon(@RequestBody Coupon coupon, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			return adminService.updateCouponAdmin(coupon);
 		}
 	return utils.getResponseEntitySesionNull();
@@ -300,7 +306,7 @@ public class AdminControlleer {
 	@GetMapping(value = "/getAllCoupByType/{type}")
 	public ResponseEntity<?> getAllCouponsByType(@PathVariable CouponType type, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			return adminService.getCouponByType(type);
 		}
 	return utils.getResponseEntitySesionNull();
@@ -310,7 +316,7 @@ public class AdminControlleer {
 	@GetMapping(value = "/getAllCoupByDate/{date}")
 	public ResponseEntity<?> getAllCouponsByDate(@PathVariable Date date, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			return adminService.getCouponByDate(date);
 		}
 	return utils.getResponseEntitySesionNull();
@@ -320,7 +326,7 @@ public class AdminControlleer {
 	@GetMapping(value = "/getAllCoupByPrice/{price1}")
 	public ResponseEntity<?> getCouponWhenPriceBetwenPrice(@PathVariable Double price1, @RequestHeader String token) {
 		CustomSession customSession = utils.isActive(token);
-		if (customSession != null) {
+		if (checkSession(customSession)) {
 			return adminService.getCouponWhenPriceBetwenPrice(price1);
 		}
 	return utils.getResponseEntitySesionNull();

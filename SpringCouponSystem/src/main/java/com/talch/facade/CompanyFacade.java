@@ -42,7 +42,7 @@ public class CompanyFacade implements Facade {
 	private final Utils utils;
 
 	private long compId;
-	private String compName;
+	private String name;
 	private Role role = Role.Company;
 
 	public ResponseEntity addCouponToUser(long userId, long coupId) {
@@ -53,7 +53,7 @@ public class CompanyFacade implements Facade {
 			coupons.add(coupon.get());
 			return ResponseEntity.status(HttpStatus.OK).body(coupons);
 		}
-		return EntitySesionNull();
+		return utils.getResponseEntitySomesingWrong();
 	}
 
 	public Optional<Coupon> findCoupById(long id) {
@@ -221,8 +221,8 @@ public class CompanyFacade implements Facade {
 		return incomeService.vievIncomeByCompany(compId);
 	}
 	
-	public List<Coupon> getAllCouponsOfAllCompanys() {
-		return couponRepository.findAll();
+	public ResponseEntity<List<Coupon>> getAllCouponsOfAllCompanys() {
+		return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findAll());
 	}
 
 }
