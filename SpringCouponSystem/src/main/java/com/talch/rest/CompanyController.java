@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.Collection;
 import java.util.List;
 
+import com.talch.beans.Role;
 import com.talch.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,8 @@ public class CompanyController {
 	private CustomSession isActive(String token) {return utils.getSystem().getTokensMap().get(token);
 	}
 
+	private
+
 	// http://localhost:8081/v1/company/logout
 	@PostMapping(value = "/logout")
 	private void logout(@RequestHeader String token) {
@@ -50,7 +53,7 @@ public class CompanyController {
 	@GetMapping(value = "/seeAllCoupons")
 	public ResponseEntity<?> seeAllCoup(@RequestHeader String token) {
 		CustomSession customSession = isActive(token);
-		if (customSession != null && customSession.getFacade().) {
+		if (customSession != null && customSession.getFacade().getRole().equals(Role.Company)) {
 			return userService.getAllCouponsOfAllCompanys(token);
 		}return utils.getResponseEntitySesionNull();
 	}

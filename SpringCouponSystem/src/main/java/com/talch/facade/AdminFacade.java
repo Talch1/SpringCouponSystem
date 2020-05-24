@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
+import com.talch.rest.CustomSession;
 import com.talch.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -47,8 +48,6 @@ public class AdminFacade implements Facade {
 
 	private final Utils utils;
 
-	private final  ResponseEntity responseEntitySomesingWrong= ResponseEntity.status(HttpStatus.BAD_REQUEST)
-			.body("Somesing Wrong");
 
 	Date date = new Date(System.currentTimeMillis());
 	Date dateMinusDayDate = new Date(System.currentTimeMillis() - (1000 * 60 * 60 * 24));
@@ -92,137 +91,162 @@ public class AdminFacade implements Facade {
 
 	// **************************user************************************
 
-	public ResponseEntity insertUser(User user) {
-		List<User> users = userRepository.findAll();
+	public ResponseEntity insertUser(User user, String token) {
+	CustomSession session = utils.isActive(token);
+		session.setLastAccessed(System.currentTimeMillis());
+		if(utils.checkRole(session,Role.Admin)) {
+			List<User> users = userRepository.findAll();
 
-		if ((users.stream().filter(u -> u.getId() == user.getId()).findFirst().isPresent())
-				|| (users.stream().filter(u -> u.getUserName().equals(user.getUserName())).findFirst().isPresent())) {
-			return  responseEntitySomesingWrong;
-		}
+			if (user.getRole().equals(Role.Customer)) {
+
+				user.setRole(Role.Customer);
+				user.setAmount(1000);
+				user.setEmail(null);
+			} else if ((user.getRole().equals(Role.Company))) {
+				user.setRole(Role.Company);
+				user.setAmount(100000);
+			}
+
+			if ((users.stream().filter(u -> u.getId() == user.getId()).findFirst().isPresent())
+					|| (users.stream().filter(u -> u.getUserName().equals(user.getUserName())).findFirst().isPresent())) {
+				return utils.getResponseEntitySomesingWrong();
+			}
 			userRepository.save(user);
+
 			return ResponseEntity.status(HttpStatus.OK).body(userRepository.findById(user.getId()));
+		}return  utils.getResponseEntitySesionNull();
 	}
 
-	public ResponseEntity deleteUserById(long userId, Role role) {
+	public ResponseEntity deleteUserById(long userId,String token) {
+		CustomSession session = utils.isActive(token);
+		session.setLastAccessed(System.currentTimeMillis());
 		Optional<User> user = userRepository.findById(userId);
 
-		if (user.isPresent()&& utils.checkRole(userId,role)){
+		if (user.isPresent()&& utils.checkRole(session,Role.Admin)){
 			userRepository.deleteById(userId);
 			List<User> allUsers = userRepository.findAll();
 
 			return ResponseEntity.status(HttpStatus.OK).body(allUsers.stream().
 					filter(u -> u.getRole().equals(role)).collect(Collectors.toList()));
-		} return responseEntitySomesingWrong;
+		} return utils.getResponseEntitySomesingWrong();
 	}
 
-	public ResponseEntity<String> deleteAllUsers(Role role) {
-		List<User> users = userRepository.findAll().stream().
-				filter(user -> user.getRole().equals(role)).
-				collect(Collectors.toList());
-		userRepository.deleteAll(users);
-		return ResponseEntity.status(HttpStatus.OK).
-				body("All users was delete");
+	public ResponseEntity<String> deleteAllUsers(String token,Role role) {
+		CustomSession session = utils.isActive(token);
+		session.setLastAccessed(System.currentTimeMillis());
+		if (utils.checkRole(session,Role.Admin)) {
+			List<User> users = userRepository.findAll().stream().
+					filter(user -> user.getRole().equals(role)).
+					collect(Collectors.toList());
+			userRepository.deleteAll(users);
+			return ResponseEntity.status(HttpStatus.OK).
+					body("All users was delete");
+		}return utils.getResponseEntitySesionNull();
 	}
 
-	public ResponseEntity getUserById(long id,Role role) {
-		if (utils.checkRole(id, role)) {
-			Optional<User> user = userRepository.findById(id);
-			if (user.isPresent()) {
+	public ResponseEntity getUserById(long id,String token) {
+		CustomSession session = utils.isActive(token);
+		session.setLastAccessed(System.currentTimeMillis());
+		Optional<User> user = userRepository.findById(id);
+		if (utils.checkRole(session, Role.Admin)&&(user.isPresent())) {
 				return ResponseEntity.status(HttpStatus.OK).body(user);
-			}
 		}
-		return responseEntitySomesingWrong;
+		return utils.getResponseEntitySomesingWrong();
 	}
 
-	public List<User> findAllUsers() {
-		return userRepository.findAll();
-	}
-
-	public ResponseEntity findAllCust(){
-		return  ResponseEntity.status(HttpStatus.OK)
-				.body(userRepository.findAll().stream().
-						filter(user -> user.getRole().equals(Role.Customer)).
-						collect(Collectors.toList()));
-	}
-	
-	public ResponseEntity findAllComp(){
-		List<User> users = findAllUsers();
-		List<User> compList = new ArrayList<User>();
-		for (User user : users) {
-			if (user.getRole().equals(Role.Company)) {
-				compList.add(user);
-			}
-		}
-		return ResponseEntity.status(HttpStatus.OK).body(
-				userRepository.findAll().stream().filter(user -> user.getRole().equals(Role.Company)));
+	public ResponseEntity findAllCust(String token){
+		CustomSession session = utils.isActive(token);
+		session.setLastAccessed(System.currentTimeMillis());
+		if (utils.checkRole(session,Role.Admin)) {
+			return ResponseEntity.status(HttpStatus.OK)
+					.body(userRepository.findAll().stream().
+							filter(user -> user.getRole().equals(Role.Customer)).
+							collect(Collectors.toList()));
+		}return utils.getResponseEntitySomesingWrong();
 	}
 	
-	public ResponseEntity<?> updateUser(long userIdtoUpdate, User user,Role role) {
+	public ResponseEntity findAllComp(String token){
+		CustomSession session = utils.isActive(token);
+		session.setLastAccessed(System.currentTimeMillis());
+		if (utils.checkRole(session,Role.Admin)) {
+			return ResponseEntity.status(HttpStatus.OK)
+					.body(userRepository.findAll().stream().
+							filter(user -> user.getRole().equals(Role.Company)).
+							collect(Collectors.toList()));
+		}return utils.getResponseEntitySomesingWrong();
+	}
+	
+	public ResponseEntity<?> updateUser(long userIdtoUpdate, User user,String token) {
+		CustomSession session = utils.isActive(token);
+		session.setLastAccessed(System.currentTimeMillis());
 		Optional<User> userToUpdate = userRepository.findById(userIdtoUpdate);
-		if (utils.checkRole(userIdtoUpdate,role)) {
+		if (utils.checkRole(session,Role.Admin) && userToUpdate.isPresent()) {
 			userToUpdate.get().setUserName(user.getUserName());
 			userToUpdate.get().setEmail(user.getEmail());
 			userToUpdate.get().setPassword(user.getPassword());
 			userRepository.save(userToUpdate.get());
 			return ResponseEntity.status(HttpStatus.OK).body(userRepository.findById(userIdtoUpdate));
-		}return responseEntitySomesingWrong;}
+		}return utils.getResponseEntitySomesingWrong();}
 
-	public ResponseEntity getUserByNameAndPass(String name, String pass,Role role) {
+	public ResponseEntity getUserByNameAndPass(String name, String pass,Role role,String token) {
+		CustomSession session = utils.isActive(token);
+		session.setLastAccessed(System.currentTimeMillis());
 		Optional<User> user = userRepository.findByUserNameAndPassword(name, pass);
-		if (utils.checkRole(user.get().getId(),role)&&user.isPresent()){
+		if (utils.checkRole(session,Role.Admin)&&(user.get().getRole().equals(role))){
 			return ResponseEntity.status(HttpStatus.OK).body(user.get());
 		}
 		return utils.getResponseEntitySomesingWrong() ;
 	}
 
+	public ResponseEntity addCouponToUser(long userId, long coupId,String token) {
+		CustomSession session = utils.isActive(token);
+		session.setLastAccessed(System.currentTimeMillis());
+		Optional<Coupon> coupon = couponRepository.findById(coupId);
+		Optional<User> userToUpdate = userRepository.findById(userId);
+		if (coupon.isPresent() && userToUpdate.isPresent() &&
+				((utils.checkRole(session,Role.Admin)) )){
+			List<Coupon> coupons = (List<Coupon>) userToUpdate.get().getCupons();
+			coupons.add(coupon.get());
+			return ResponseEntity.status(HttpStatus.OK).body(coupons);
+		}
+		return utils.getResponseEntitySomesingWrong();
+	}
+
 	// **************************CouponS************************************
 
-	public ResponseEntity addCoupon(Coupon coupon) {
-		if (userRepository.findById(coupon.getId()).isPresent()) {
-			return utils.getResponseEntitySomesingWrong();
-		}
+	public ResponseEntity addCoupon(Coupon coupon,String token) {
+		CustomSession session = utils.isActive(token);
+		session.setLastAccessed(System.currentTimeMillis());
+		if ((!userRepository.findById(coupon.getId()).isPresent())&& (utils.checkRole(session,Role.Admin))) {
 			couponRepository.save(coupon);
-		return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findAll());
-	}
-
-	public Collection<Coupon> deleteCouponByUser(long userId, long coupId) {
-
-		User user = userRepository.getOne(userId);
-		List<Coupon> list = (List<Coupon>) user.getCupons();
-		List<Coupon> list2 = new ArrayList<Coupon>();
-		for (Coupon coupon : list) {
-			if (coupon.getId() != coupId) {
-				list2.add(coupon);
-			}
+			return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findAll());
 		}
-		user.setCupons(list2);
-		userRepository.save(user);
-		return list2;
-	}
-	public ResponseEntity deleteCoupon(long coupId) {
-		couponRepository.deleteById(coupId);
-		return ResponseEntity.status(HttpStatus.OK).body( couponRepository.findAll());
+		return utils.getResponseEntitySomesingWrong();
 	}
 
-	public List<Coupon> findAllCouponsByUser(long userId) {
-		return (List<Coupon>) userRepository.getOne(userId).getCupons();
+	public ResponseEntity getAllcouponsByUserId(long id,String token) {
+		CustomSession session = utils.isActive(token);
+		session.setLastAccessed(System.currentTimeMillis());
+		if (utils.checkRole(session,Role.Admin)) {
+			Collection<Coupon> coupons = userRepository.findById(id).get().getCupons();
+			return ResponseEntity.status(HttpStatus.OK).body(coupons);
+		}return utils.getResponseEntitySesionNull();
 	}
 
-	public Coupon findAllCoupByUser(long userId, long coupId) {
-		List<Coupon> coupons = (List<Coupon>) userRepository.getOne(userId).getCupons();
-		Coupon coupon2 = new Coupon();
-		for (Coupon coupon : coupons) {
-			if (coupId == coupon.getId()) {
-				coupon2 = couponRepository.getOne(coupId);
-			}
-		}
-		return coupon2;
+	public ResponseEntity deleteCoupon(long coupId,String token) {
+		CustomSession session = utils.isActive(token);
+		session.setLastAccessed(System.currentTimeMillis());
+		if (utils.checkRole(session,Role.Admin)) {
+			couponRepository.deleteById(coupId);
+			return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findAll());
+		} return utils.getResponseEntitySesionNull();
 	}
 
-	public ResponseEntity updateCouponAdmin(Coupon coupon) {
-
+	public ResponseEntity updateCouponAdmin(Coupon coupon,String token) {
+		CustomSession session = utils.isActive(token);
+		session.setLastAccessed(System.currentTimeMillis());
 		Optional<Coupon> coupToUpdate = couponRepository.findById(coupon.getId());
-		if (coupToUpdate.isPresent()){
+		if (coupToUpdate.isPresent() && utils.checkRole(session,Role.Admin)){
 			coupToUpdate.get().setEndDate(coupon.getEndDate());
 			coupToUpdate.get().setPrice(coupon.getPrice());
 			couponRepository.save(coupToUpdate.get());
@@ -230,63 +254,58 @@ public class AdminFacade implements Facade {
 		} return  utils.getResponseEntitySomesingWrong();
 	}
 
-	public Coupon updateCoupon(Coupon coupon, long userId) throws ExistEx {
-		boolean check = false;
-		List<Coupon> list = (List<Coupon>) userRepository.getOne(userId).getCupons();
-		for (Coupon coupon2 : list) {
-			if (coupon.getId() == coupon2.getId()) {
-				check = true;
-			}
-		}
-		if (check) {
-
-			Coupon coupToUpdate = couponRepository.getOne(coupon.getId());
-			coupToUpdate.setEndDate(coupon.getEndDate());
-
-			coupToUpdate.setPrice(coupon.getPrice());
-			couponRepository.save(coupToUpdate);
-		} else {
-			throw new ExistEx("You don't have this coupon");
-		}
-		return couponRepository.getOne(coupon.getId());
-
+	public ResponseEntity<String> deleteCoupons(String token) {
+		CustomSession session = utils.isActive(token);
+		session.setLastAccessed(System.currentTimeMillis());
+		if (utils.checkRole(session,Role.Admin)) {
+			couponRepository.deleteAll();
+			return ResponseEntity.status(HttpStatus.OK).body("All Coupons Deleted");
+		}return  utils.getResponseEntitySesionNull();
 	}
 
-	public List<Coupon> deleteCouponsByUser(long userId) {
-		Optional<User> user = userRepository.findById(userId);
-		user.get().setCupons(null);
-		return (List<Coupon>) user.get().getCupons();
-	}
-
-	public ResponseEntity<String> deleteCoupons() {
-		couponRepository.deleteAll();
-		return ResponseEntity.status(HttpStatus.OK).body("All Coupons Deleted");
-	}
-
-	public ResponseEntity findCoupById(long id) {
+	public ResponseEntity findCoupById(long id,String token) {
+		CustomSession session = utils.isActive(token);
+		session.setLastAccessed(System.currentTimeMillis());
 		Optional<Coupon> coupon = couponRepository.findById(id);
-		if (coupon.isPresent()) {
+		if (coupon.isPresent()&&(utils.checkRole(session,Role.Admin))) {
 			return ResponseEntity.status(HttpStatus.OK).body(coupon);
 		}
 		return  utils.getResponseEntitySomesingWrong();
 	}
 
-	public ResponseEntity findAllCoup() {
-		return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findAll());
+	public ResponseEntity findAllCoup(String token) {
+		CustomSession session = utils.isActive(token);
+		session.setLastAccessed(System.currentTimeMillis());
+		if (utils.checkRole(session,Role.Admin)) {
+			return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findAll());
+		}
+		return  utils.getResponseEntitySesionNull();
 	}
 
-	public ResponseEntity<List<Coupon>>getCouponByType(CouponType type) {
-		return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findByType(type));
+	public ResponseEntity getCouponByType(CouponType type,String token) {
+		CustomSession session = utils.isActive(token);
+		session.setLastAccessed(System.currentTimeMillis());
+		if ( utils.checkRole(session,Role.Admin)) {
+			return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findByType(type));
+		}
+		return utils.getResponseEntitySesionNull();
 	}
 
-	public ResponseEntity<List<Coupon>> getCouponByDate(Date date) {
-
-		return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findByEndDateBefore(date));
-
+	public ResponseEntity getCouponByDate(Date date,String token) {
+		CustomSession session = utils.isActive(token);
+		session.setLastAccessed(System.currentTimeMillis());
+		if ( utils.checkRole(session,Role.Admin)) {
+			return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findByEndDateBefore(date));
+		}
+		return utils.getResponseEntitySesionNull();
 	}
 
-	public ResponseEntity<List<Coupon>> getCouponWhenPriceBetwenPrice(Double price1) {
-		return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findByPriceLessThan(price1));
-
+	public ResponseEntity getCouponWhenPriceBetwenPrice(Double price1,String token) {
+		CustomSession session = utils.isActive(token);
+		session.setLastAccessed(System.currentTimeMillis());
+		if ( utils.checkRole(session,Role.Admin)) {
+			return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findByPriceLessThan(price1));
+		}
+		return utils.getResponseEntitySesionNull();
 	}
 }

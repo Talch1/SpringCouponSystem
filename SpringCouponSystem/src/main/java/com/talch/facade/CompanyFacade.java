@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import com.talch.rest.CustomSession;
 import com.talch.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +46,11 @@ public class CompanyFacade implements Facade {
 	private String name;
 	private Role role = Role.Company;
 
-	public ResponseEntity addCouponToUser(long userId, long coupId) {
+	public ResponseEntity addCouponToUser(long userId, long coupId, CustomSession session) {
 		Optional<Coupon> coupon = couponRepository.findById(coupId);
 		Optional<User> userToUpdate = userRepository.findById(userId);
-		if (coupon.isPresent() && userToUpdate.isPresent()) {
+		if (coupon.isPresent() && userToUpdate.isPresent()&&
+				 (utils.checkRole(session,Role.Company))){
 			List<Coupon> coupons = (List<Coupon>) userToUpdate.get().getCupons();
 			coupons.add(coupon.get());
 			return ResponseEntity.status(HttpStatus.OK).body(coupons);
@@ -221,7 +223,7 @@ public class CompanyFacade implements Facade {
 		return incomeService.vievIncomeByCompany(compId);
 	}
 	
-	public ResponseEntity<List<Coupon>> getAllCouponsOfAllCompanys() {
+	public ResponseEntity<List<Coupon>> getAllCouponsOfAllCompanys(String token) {
 		return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findAll());
 	}
 

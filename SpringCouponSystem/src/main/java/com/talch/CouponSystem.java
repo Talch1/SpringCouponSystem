@@ -14,7 +14,7 @@ import com.talch.facade.CompanyFacade;
 import com.talch.facade.CustomerFacade;
 import com.talch.facade.Facade;
 import com.talch.repo.UserRepository;
-import com.talch.rest.CustomSession;
+import com.talch.rest.session;
 
 import lombok.Data;
 
@@ -39,7 +39,7 @@ public class CouponSystem {
 	
 	
 	@Autowired
-	private Map<String, CustomSession> tokensMap;
+	private Map<String, session> tokensMap;
 	
 	@PostConstruct
 	public void start() {

@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Session;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -30,8 +31,8 @@ public class Utils {
     public CustomSession isActive(String token) {
         return system.getTokensMap().get(token);
     }
-    public boolean checkRole(long id, Role role){
-        if(userRepository.findById(id).get().getRole().equals(role)){
+    public boolean checkRole(CustomSession session,Role role){
+        if((session != null)&&(session.getFacade().getRole().equals(role))){
             return true;
         }return false;
     }
