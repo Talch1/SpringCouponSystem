@@ -1,14 +1,9 @@
 package com.talch.rest;
 
 import java.sql.Date;
-import java.util.Collection;
-import java.util.List;
 
-import com.talch.beans.Role;
 import com.talch.utils.Utils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.talch.CouponSystem;
 import com.talch.beans.Coupon;
 
-import com.talch.exeption.ExistEx;
 import com.talch.facade.CompanyFacade;
 
 @RestController
@@ -31,17 +25,11 @@ import com.talch.facade.CompanyFacade;
 @RequestMapping("/v1/company")
 public class CompanyController {
 
-
-	private final CompanyFacade userService;
+	private final CompanyFacade companyFacade;
 
 	private final CouponSystem system;
 
 	private final Utils utils;
-
-	private CustomSession isActive(String token) {return utils.getSystem().getTokensMap().get(token);
-	}
-
-	private
 
 	// http://localhost:8081/v1/company/logout
 	@PostMapping(value = "/logout")
@@ -52,132 +40,66 @@ public class CompanyController {
 	// http://localhost:8081/v1/company/seeAllCoupons
 	@GetMapping(value = "/seeAllCoupons")
 	public ResponseEntity<?> seeAllCoup(@RequestHeader String token) {
-		CustomSession customSession = isActive(token);
-		if (customSession != null && customSession.getFacade().getRole().equals(Role.Company)) {
-			return userService.getAllCouponsOfAllCompanys(token);
-		}return utils.getResponseEntitySesionNull();
+			return companyFacade.getAllCouponsOfAllCompanys(token);
 	}
 
 	// http://localhost:8081/v1/company/addCouponToComp
 	@PostMapping(value = "/addCouponToComp")
 	public ResponseEntity<?> addCouponsToComp(@RequestHeader String token, @RequestBody long coupId) {
-		CustomSession customSession = isActive(token);
-
-		if (customSession != null) {
-			customSession.setLastAccessed(System.currentTimeMillis());
-			long userId = ((CompanyFacade) customSession.getFacade()).getCompId();
-			((CompanyFacade) customSession.getFacade()).addCouponToUser(userId, coupId);
-			List<Coupon> coupons = (List<Coupon>) userService.getAllcouponsByUserId(userId);
-			return ResponseEntity.status(HttpStatus.OK).body(coupons);
-		}
-		return new ResponseEntity(HttpStatus.NOT_FOUND);
+		return companyFacade.addCouponToUser(coupId,token);
 	}
 
 	// http://localhost:8081/v1/company/createCoup
 	@PostMapping(value = "/createCoup")
-	public ResponseEntity<?> insertCoup(@RequestBody Coupon coup, @RequestHeader String token) throws ExistEx {
-		CustomSession customSession = isActive(token);
-		if (customSession != null) {
-			customSession.setLastAccessed(System.currentTimeMillis());
-			long userId = ((CompanyFacade) customSession.getFacade()).getCompId();
-			userService.addCoupon(coup, userId);
-			return ResponseEntity.status(HttpStatus.OK).body(userService.findAllCouponsByUser(userId));
-		}
-		return new ResponseEntity(HttpStatus.NOT_FOUND);
+	public ResponseEntity<?> insertCoup(@RequestBody Coupon coup, @RequestHeader String token)  {
+		return 	companyFacade.addCoupon(coup,token);
 	}
 
 	// http://localhost:8081/v1/company/getCoupByID/{coupId}
 	@GetMapping(value = "/getCoupByID/{coupId}")
 	public ResponseEntity<?> getCoupByID(@RequestHeader String token, @PathVariable long coupId) {
-		CustomSession customSession = isActive(token);
-		if (customSession != null) {
-			customSession.setLastAccessed(System.currentTimeMillis());
-			long userId = ((CompanyFacade) customSession.getFacade()).getCompId();
-			return ResponseEntity.status(HttpStatus.OK).body(userService.findCoupfromUserbyCouponId(userId, coupId));
-		}
-		return new ResponseEntity(HttpStatus.NOT_FOUND);
+		return  companyFacade.findCoupfromUserbyCouponId(token, coupId);
 	}
 
 	// http://localhost:8081/v1/company/deleteCouponById/{coupId}
 	@DeleteMapping(value = "/deleteCouponById/{coupId}")
-	public ResponseEntity<?> deleteCouponById(@RequestHeader String token, @PathVariable long coupId) throws ExistEx {
-		CustomSession customSession = isActive(token);
-		if (customSession != null) {
-			customSession.setLastAccessed(System.currentTimeMillis());
-			long userId = ((CompanyFacade) customSession.getFacade()).getCompId();
-			return ResponseEntity.status(HttpStatus.OK).body(userService.deleteCouponByUser(userId, coupId));
-		}
-		return new ResponseEntity(HttpStatus.NOT_FOUND);
+	public ResponseEntity<?> deleteCouponById(@RequestHeader String token, @PathVariable long coupId) {
+			return companyFacade.deleteCouponByUser(token, coupId);
 	}
 
 	// http://localhost:8081/v1/company/getCoupons"
 	@GetMapping(value = "/getCoupons")
 	public ResponseEntity<?> getAllCoupons(@RequestHeader String token) {
-		CustomSession customSession = isActive(token);
-		if (customSession != null) {
-			customSession.setLastAccessed(System.currentTimeMillis());
-			long userId = ((CompanyFacade) customSession.getFacade()).getCompId();
-			return ResponseEntity.status(HttpStatus.OK).body(userService.findAllCouponsByUser(userId));
-		}
-		return new ResponseEntity(HttpStatus.NOT_FOUND);
+			return companyFacade.findAllCouponsByUser(token);
 	}
 
 	// http://localhost:8081/v1/company/deleteCoup/All/
 	@DeleteMapping(value = "/deleteCoup/All")
 	public ResponseEntity<?> deleteCoupons(@RequestHeader String token) {
-		CustomSession customSession = isActive(token);
-		if (customSession != null) {
-			customSession.setLastAccessed(System.currentTimeMillis());
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(userService.deleteCouponsByUser(((CompanyFacade) customSession.getFacade()).getCompId()));
-		}
-		return new ResponseEntity(HttpStatus.NOT_FOUND);
+			return companyFacade.deleteCouponsByUser(token);
 	}
 
 	// http://localhost:8081/v1/company/coupUpdate
 	@PutMapping(value = "/coupUpdate")
 	public ResponseEntity<?> updateCoupon(@RequestBody Coupon coupon, @RequestHeader String token) {
-		CustomSession customSession = isActive(token);
-		if (customSession != null) {
-			long userId = ((CompanyFacade) customSession.getFacade()).getCompId();
-			userService.updateCoupon(coupon, userId);
-			return ResponseEntity.status(HttpStatus.OK).body(userService.findCoupById(userId));
-		}
-		return new ResponseEntity(HttpStatus.NOT_FOUND);
+			return companyFacade.updateCoupon(coupon,token);
 	}
 
 	// http://localhost:8081/v1/company/findUserCoupByType{type}
 	@GetMapping(value = "/findUserCoupByType/{type}")
 	public ResponseEntity<?> findUserCoupByType(@RequestHeader String token, @PathVariable String type) {
-		CustomSession customSession = isActive(token);
-		if (customSession != null) {
-			long userId = ((CompanyFacade) customSession.getFacade()).getCompId();
-
-			return ResponseEntity.status(HttpStatus.OK).body(userService.getUserCouponByType(userId, type));
-		}
-		return new ResponseEntity(HttpStatus.NOT_FOUND);
+			return companyFacade.getUserCouponByType(token, type);
 	}
 
 	// http://localhost:8081/v1/company/findUserCoupByDate/{date}
 	@GetMapping(value = "/findUserCoupByDate/{date}")
 	public ResponseEntity<?> findUserCoupByDate(@RequestHeader String token, @PathVariable Date date) {
-		CustomSession customSession = isActive(token);
-		if (customSession != null) {
-			long userId = ((CompanyFacade) customSession.getFacade()).getCompId();
-			return ResponseEntity.status(HttpStatus.OK).body(userService.getUserCouponByDateBefore(userId, date));
-		}
-		return new ResponseEntity(HttpStatus.NOT_FOUND);
+			return companyFacade.getUserCouponByDateBefore(token, date);
 	}
 
 	// http://localhost:8081/v1/company/findUserCoupByPrice/{price}
 	@GetMapping(value = "/findUserCoupByPrice/{price}")
 	public ResponseEntity<?> findUserCoupByPrice(@RequestHeader String token, @PathVariable double price) {
-		CustomSession customSession = isActive(token);
-		if (customSession != null) {
-			long userId = ((CompanyFacade) customSession.getFacade()).getCompId();
-			return ResponseEntity.status(HttpStatus.OK).body(userService.getUserCouponByPriceLessThat(userId, price));
+			return companyFacade.getUserCouponByPriceLessThat(token, price);
 		}
-		return new ResponseEntity(HttpStatus.NOT_FOUND);
-	}
-
 }

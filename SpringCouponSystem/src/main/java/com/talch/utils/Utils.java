@@ -29,11 +29,17 @@ public class Utils {
             .body("Somesing Wrong");
 
     public CustomSession isActive(String token) {
-        return system.getTokensMap().get(token);
+               CustomSession customSession = system.getTokensMap().get(token);
+               if (customSession!=null){
+                   customSession.setLastAccessed(System.currentTimeMillis());
+                   return  customSession;
+               } return null;
     }
+
     public boolean checkRole(CustomSession session,Role role){
         if((session != null)&&(session.getFacade().getRole().equals(role))){
             return true;
         }return false;
     }
+
 }

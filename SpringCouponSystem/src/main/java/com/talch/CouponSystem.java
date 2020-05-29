@@ -4,6 +4,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import com.talch.rest.CustomSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.talch.beans.Role;
@@ -14,7 +15,7 @@ import com.talch.facade.CompanyFacade;
 import com.talch.facade.CustomerFacade;
 import com.talch.facade.Facade;
 import com.talch.repo.UserRepository;
-import com.talch.rest.session;
+
 
 import lombok.Data;
 
@@ -24,23 +25,23 @@ public class CouponSystem {
 
 	@Autowired
 	private AdminFacade admin;
-	
+
 	@Autowired
 	private CompanyFacade company;
-	
+
 	@Autowired
 	private CustomerFacade customer;
-	
+
 	@Autowired
 	private DailyCouponExpirationTask dayli;
 
 	@Autowired
 	private UserRepository userRepository;
-	
-	
+
+
 	@Autowired
-	private Map<String, session> tokensMap;
-	
+	private Map<String, CustomSession> tokensMap;
+
 	@PostConstruct
 	public void start() {
 		dayli.start();

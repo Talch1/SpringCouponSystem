@@ -37,7 +37,7 @@ public class CustomerFacade implements Facade {
 	@Autowired
 	IncomeService incomeService;
 	
-	private long custId;
+	private long id;
 	private String custName;
 	private Role role = Role.Customer;
 	

@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
-import com.talch.rest.CustomSession;
 import com.talch.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,7 +20,6 @@ import com.talch.beans.Coupon;
 import com.talch.beans.CouponType;
 import com.talch.beans.Role;
 import com.talch.beans.User;
-import com.talch.exeption.ExistEx;
 import com.talch.repo.CouponRepository;
 import com.talch.repo.UserRepository;
 
@@ -32,6 +30,7 @@ import lombok.Data;
 @Data
 @RequiredArgsConstructor
 public class AdminFacade implements Facade {
+
 
 
 	private final long id = 1;
@@ -92,13 +91,9 @@ public class AdminFacade implements Facade {
 	// **************************user************************************
 
 	public ResponseEntity insertUser(User user, String token) {
-	CustomSession session = utils.isActive(token);
-		session.setLastAccessed(System.currentTimeMillis());
-		if(utils.checkRole(session,Role.Admin)) {
+		if(utils.checkRole(utils.isActive(token),Role.Admin)) {
 			List<User> users = userRepository.findAll();
-
 			if (user.getRole().equals(Role.Customer)) {
-
 				user.setRole(Role.Customer);
 				user.setAmount(1000);
 				user.setEmail(null);
@@ -106,7 +101,6 @@ public class AdminFacade implements Facade {
 				user.setRole(Role.Company);
 				user.setAmount(100000);
 			}
-
 			if ((users.stream().filter(u -> u.getId() == user.getId()).findFirst().isPresent())
 					|| (users.stream().filter(u -> u.getUserName().equals(user.getUserName())).findFirst().isPresent())) {
 				return utils.getResponseEntitySomesingWrong();
@@ -118,23 +112,17 @@ public class AdminFacade implements Facade {
 	}
 
 	public ResponseEntity deleteUserById(long userId,String token) {
-		CustomSession session = utils.isActive(token);
-		session.setLastAccessed(System.currentTimeMillis());
 		Optional<User> user = userRepository.findById(userId);
-
-		if (user.isPresent()&& utils.checkRole(session,Role.Admin)){
+		if (user.isPresent()&& utils.checkRole(utils.isActive(token),Role.Admin)){
 			userRepository.deleteById(userId);
 			List<User> allUsers = userRepository.findAll();
-
 			return ResponseEntity.status(HttpStatus.OK).body(allUsers.stream().
 					filter(u -> u.getRole().equals(role)).collect(Collectors.toList()));
 		} return utils.getResponseEntitySomesingWrong();
 	}
 
 	public ResponseEntity<String> deleteAllUsers(String token,Role role) {
-		CustomSession session = utils.isActive(token);
-		session.setLastAccessed(System.currentTimeMillis());
-		if (utils.checkRole(session,Role.Admin)) {
+		if (utils.checkRole(utils.isActive(token),Role.Admin)) {
 			List<User> users = userRepository.findAll().stream().
 					filter(user -> user.getRole().equals(role)).
 					collect(Collectors.toList());
@@ -145,42 +133,37 @@ public class AdminFacade implements Facade {
 	}
 
 	public ResponseEntity getUserById(long id,String token) {
-		CustomSession session = utils.isActive(token);
-		session.setLastAccessed(System.currentTimeMillis());
 		Optional<User> user = userRepository.findById(id);
-		if (utils.checkRole(session, Role.Admin)&&(user.isPresent())) {
+		if (utils.checkRole(utils.isActive(token), Role.Admin)&&(user.isPresent())) {
 				return ResponseEntity.status(HttpStatus.OK).body(user);
 		}
 		return utils.getResponseEntitySomesingWrong();
 	}
 
 	public ResponseEntity findAllCust(String token){
-		CustomSession session = utils.isActive(token);
-		session.setLastAccessed(System.currentTimeMillis());
-		if (utils.checkRole(session,Role.Admin)) {
+
+		if (utils.checkRole(utils.isActive(token),Role.Admin)) {
 			return ResponseEntity.status(HttpStatus.OK)
 					.body(userRepository.findAll().stream().
 							filter(user -> user.getRole().equals(Role.Customer)).
 							collect(Collectors.toList()));
 		}return utils.getResponseEntitySomesingWrong();
 	}
-	
+
 	public ResponseEntity findAllComp(String token){
-		CustomSession session = utils.isActive(token);
-		session.setLastAccessed(System.currentTimeMillis());
-		if (utils.checkRole(session,Role.Admin)) {
+
+		if (utils.checkRole(utils.isActive(token),Role.Admin)) {
 			return ResponseEntity.status(HttpStatus.OK)
 					.body(userRepository.findAll().stream().
 							filter(user -> user.getRole().equals(Role.Company)).
 							collect(Collectors.toList()));
 		}return utils.getResponseEntitySomesingWrong();
 	}
-	
+
 	public ResponseEntity<?> updateUser(long userIdtoUpdate, User user,String token) {
-		CustomSession session = utils.isActive(token);
-		session.setLastAccessed(System.currentTimeMillis());
+
 		Optional<User> userToUpdate = userRepository.findById(userIdtoUpdate);
-		if (utils.checkRole(session,Role.Admin) && userToUpdate.isPresent()) {
+		if (utils.checkRole(utils.isActive(token),Role.Admin) && userToUpdate.isPresent()) {
 			userToUpdate.get().setUserName(user.getUserName());
 			userToUpdate.get().setEmail(user.getEmail());
 			userToUpdate.get().setPassword(user.getPassword());
@@ -189,22 +172,20 @@ public class AdminFacade implements Facade {
 		}return utils.getResponseEntitySomesingWrong();}
 
 	public ResponseEntity getUserByNameAndPass(String name, String pass,Role role,String token) {
-		CustomSession session = utils.isActive(token);
-		session.setLastAccessed(System.currentTimeMillis());
+
 		Optional<User> user = userRepository.findByUserNameAndPassword(name, pass);
-		if (utils.checkRole(session,Role.Admin)&&(user.get().getRole().equals(role))){
+		if (utils.checkRole(utils.isActive(token),Role.Admin)&&(user.get().getRole().equals(role))){
 			return ResponseEntity.status(HttpStatus.OK).body(user.get());
 		}
 		return utils.getResponseEntitySomesingWrong() ;
 	}
 
 	public ResponseEntity addCouponToUser(long userId, long coupId,String token) {
-		CustomSession session = utils.isActive(token);
-		session.setLastAccessed(System.currentTimeMillis());
+
 		Optional<Coupon> coupon = couponRepository.findById(coupId);
 		Optional<User> userToUpdate = userRepository.findById(userId);
 		if (coupon.isPresent() && userToUpdate.isPresent() &&
-				((utils.checkRole(session,Role.Admin)) )){
+				((utils.checkRole(utils.isActive(token),Role.Admin)) )){
 			List<Coupon> coupons = (List<Coupon>) userToUpdate.get().getCupons();
 			coupons.add(coupon.get());
 			return ResponseEntity.status(HttpStatus.OK).body(coupons);
@@ -215,9 +196,9 @@ public class AdminFacade implements Facade {
 	// **************************CouponS************************************
 
 	public ResponseEntity addCoupon(Coupon coupon,String token) {
-		CustomSession session = utils.isActive(token);
-		session.setLastAccessed(System.currentTimeMillis());
-		if ((!userRepository.findById(coupon.getId()).isPresent())&& (utils.checkRole(session,Role.Admin))) {
+
+		if ((!userRepository.findById(coupon.getId()).isPresent())&&
+				(utils.checkRole(utils.isActive(token),Role.Admin))) {
 			couponRepository.save(coupon);
 			return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findAll());
 		}
@@ -225,28 +206,25 @@ public class AdminFacade implements Facade {
 	}
 
 	public ResponseEntity getAllcouponsByUserId(long id,String token) {
-		CustomSession session = utils.isActive(token);
-		session.setLastAccessed(System.currentTimeMillis());
-		if (utils.checkRole(session,Role.Admin)) {
+
+		if (utils.checkRole(utils.isActive(token),Role.Admin)) {
 			Collection<Coupon> coupons = userRepository.findById(id).get().getCupons();
 			return ResponseEntity.status(HttpStatus.OK).body(coupons);
 		}return utils.getResponseEntitySesionNull();
 	}
 
 	public ResponseEntity deleteCoupon(long coupId,String token) {
-		CustomSession session = utils.isActive(token);
-		session.setLastAccessed(System.currentTimeMillis());
-		if (utils.checkRole(session,Role.Admin)) {
+
+		if (utils.checkRole(utils.isActive(token),Role.Admin)) {
 			couponRepository.deleteById(coupId);
 			return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findAll());
 		} return utils.getResponseEntitySesionNull();
 	}
 
 	public ResponseEntity updateCouponAdmin(Coupon coupon,String token) {
-		CustomSession session = utils.isActive(token);
-		session.setLastAccessed(System.currentTimeMillis());
+
 		Optional<Coupon> coupToUpdate = couponRepository.findById(coupon.getId());
-		if (coupToUpdate.isPresent() && utils.checkRole(session,Role.Admin)){
+		if (coupToUpdate.isPresent() && utils.checkRole(utils.isActive(token),Role.Admin)){
 			coupToUpdate.get().setEndDate(coupon.getEndDate());
 			coupToUpdate.get().setPrice(coupon.getPrice());
 			couponRepository.save(coupToUpdate.get());
@@ -255,55 +233,47 @@ public class AdminFacade implements Facade {
 	}
 
 	public ResponseEntity<String> deleteCoupons(String token) {
-		CustomSession session = utils.isActive(token);
-		session.setLastAccessed(System.currentTimeMillis());
-		if (utils.checkRole(session,Role.Admin)) {
+
+		if (utils.checkRole(utils.isActive(token),Role.Admin)) {
 			couponRepository.deleteAll();
 			return ResponseEntity.status(HttpStatus.OK).body("All Coupons Deleted");
 		}return  utils.getResponseEntitySesionNull();
 	}
 
 	public ResponseEntity findCoupById(long id,String token) {
-		CustomSession session = utils.isActive(token);
-		session.setLastAccessed(System.currentTimeMillis());
+
 		Optional<Coupon> coupon = couponRepository.findById(id);
-		if (coupon.isPresent()&&(utils.checkRole(session,Role.Admin))) {
+		if (coupon.isPresent()&&(utils.checkRole(utils.isActive(token),Role.Admin))) {
 			return ResponseEntity.status(HttpStatus.OK).body(coupon);
 		}
 		return  utils.getResponseEntitySomesingWrong();
 	}
 
 	public ResponseEntity findAllCoup(String token) {
-		CustomSession session = utils.isActive(token);
-		session.setLastAccessed(System.currentTimeMillis());
-		if (utils.checkRole(session,Role.Admin)) {
+
+		if (utils.checkRole(utils.isActive(token),Role.Admin)) {
 			return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findAll());
 		}
 		return  utils.getResponseEntitySesionNull();
 	}
 
 	public ResponseEntity getCouponByType(CouponType type,String token) {
-		CustomSession session = utils.isActive(token);
-		session.setLastAccessed(System.currentTimeMillis());
-		if ( utils.checkRole(session,Role.Admin)) {
+
+		if ( utils.checkRole(utils.isActive(token),Role.Admin)) {
 			return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findByType(type));
 		}
 		return utils.getResponseEntitySesionNull();
 	}
 
 	public ResponseEntity getCouponByDate(Date date,String token) {
-		CustomSession session = utils.isActive(token);
-		session.setLastAccessed(System.currentTimeMillis());
-		if ( utils.checkRole(session,Role.Admin)) {
+		if ( utils.checkRole(utils.isActive(token),Role.Admin)) {
 			return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findByEndDateBefore(date));
 		}
 		return utils.getResponseEntitySesionNull();
 	}
 
 	public ResponseEntity getCouponWhenPriceBetwenPrice(Double price1,String token) {
-		CustomSession session = utils.isActive(token);
-		session.setLastAccessed(System.currentTimeMillis());
-		if ( utils.checkRole(session,Role.Admin)) {
+		if ( utils.checkRole(utils.isActive(token),Role.Admin)) {
 			return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findByPriceLessThan(price1));
 		}
 		return utils.getResponseEntitySesionNull();
