@@ -2,13 +2,19 @@ package com.talch.service;
 
 import com.talch.beans.Income;
 import com.talch.beans.Role;
+import com.talch.facade.AdminFacade;
 import com.talch.repo.IncomeRepository;
+import com.talch.rest.CustomSession;
+import com.talch.utils.Utils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,33 +22,33 @@ public class IncomeService {
 
     private final IncomeRepository incomeRepository;
 
+    private final Utils utils;
+
     public void storeIncome(Income income) {
         incomeRepository.save(income);
     }
 
-    public Collection<Income> viewAllIncome() {
-        return incomeRepository.findAll();
+    public ResponseEntity viewAllIncome(String token) {
+        if (utils.checkRole(utils.getSystem().getTokensMap().get(token),Role.Admin)){
+            return ResponseEntity.status(HttpStatus.OK).body(incomeRepository.findAll());
+        }else return utils.getResponseEntitySesionNull();
     }
 
-    public Collection<Income> vievIncomeByCustomer(long custId) {
-        List<Income> allIncomes = incomeRepository.findAll();
-        List<Income> custIncomes = new ArrayList<Income>();
-        for (Income income : allIncomes) {
-            if (income.getRole().equals(Role.Customer) && (income.getUserId() == custId)) {
-                custIncomes.add(income);
-            }
-        }
-        return custIncomes;
+    public ResponseEntity vievIncomeByCustomer(String token, long custId) {
+        if (utils.checkRole(utils.getSystem().getTokensMap().get(token),Role.Admin)){
+            List<Income> custIncomes = incomeRepository.findAll().stream()
+                    .filter(income -> (((income.getRole().equals(Role.Customer)) && (income.getId() == custId))))
+                    .collect(Collectors.toList());
+            return ResponseEntity.status(HttpStatus.OK).body(custIncomes);
+        } else return utils.getResponseEntitySesionNull();
     }
 
-    public Collection<Income> vievIncomeByCompany(long compId) {
-        List<Income> allIncomes = incomeRepository.findAll();
-        List<Income> compIncomes = new ArrayList<Income>();
-        for (Income income : allIncomes) {
-            if ((income.getRole().equals(Role.Company)) && income.getUserId() == compId) {
-                compIncomes.add(income);
-            }
-        }
-        return compIncomes;
+    public ResponseEntity vievIncomeByCompany(String token) {
+        if (utils.checkRole(utils.getSystem().getTokensMap().get(token), Role.Company)) {
+            List<Income> compIncomes = incomeRepository.findAll().stream()
+                    .filter(income -> ((income.getRole().equals(Role.Company)) && (income.getUserId() == utils.getSystem().getTokensMap().get(token).getFacade().getId())))
+                    .collect(Collectors.toList());
+            return ResponseEntity.status(HttpStatus.OK).body(compIncomes);
+        } else return utils.getResponseEntitySesionNull();
     }
 }

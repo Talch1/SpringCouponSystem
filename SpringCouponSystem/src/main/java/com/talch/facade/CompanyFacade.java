@@ -190,8 +190,8 @@ public class CompanyFacade implements Facade {
         return utils.getResponseEntitySesionNull();
     }
 
-    public Collection<Income> viewIncomes(long compId) {
-        return incomeService.vievIncomeByCompany(compId);
+    public ResponseEntity viewIncomes(String token) {
+        return incomeService.vievIncomeByCompany(token);
     }
 
     public ResponseEntity getAllCouponsOfAllCompanys(String token) {

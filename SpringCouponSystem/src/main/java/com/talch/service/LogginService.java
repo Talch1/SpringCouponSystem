@@ -16,7 +16,8 @@ import java.util.UUID;
 public class LogginService {
 
     private final Utils utils;
-    public ResponseEntity login(String userName,String password,String type) {
+
+    public ResponseEntity login(String userName, String password, String type) {
         if (!type.equals("Admin") && !type.equals("Company") && !type.equals("Customer")) {
             return new ResponseEntity<>("Wrong type", HttpStatus.UNAUTHORIZED);
         }
@@ -24,13 +25,13 @@ public class LogginService {
         Facade facade = null;
         String token = UUID.randomUUID().toString();
         long lastAccessed = System.currentTimeMillis();
-            facade = utils.getSystem().login(userName, password, Role.valueOf(type));
-            if (facade != null) {
-                session.setFacade(facade);
-                session.setLastAccessed(lastAccessed);
-                utils.getSystem().getTokensMap().put(token, session);
-                return ResponseEntity.status(HttpStatus.OK).body(token);
-            }
-              return utils.getResponseEntitySesionNull();
-            }
+        facade = utils.getSystem().login(userName, password, Role.valueOf(type));
+        if (facade != null) {
+            session.setFacade(facade);
+            session.setLastAccessed(lastAccessed);
+            utils.getSystem().getTokensMap().put(token, session);
+            return ResponseEntity.status(HttpStatus.OK).body(token);
+        }
+        return utils.getResponseEntitySesionNull();
     }
+}
