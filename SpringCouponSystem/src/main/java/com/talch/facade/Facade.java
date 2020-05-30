@@ -4,8 +4,8 @@ import com.talch.beans.Role;
 
 public interface Facade {
 
-   Role getRole();
+    Role getRole();
 
-   long getId();
+    long getId();
 }
 

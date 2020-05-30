@@ -1,143 +1,123 @@
 package com.talch.facade;
 
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
-import javax.transaction.Transactional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
-
-import com.talch.beans.Coupon;
-import com.talch.beans.CouponType;
-import com.talch.beans.Description;
-import com.talch.beans.Income;
-import com.talch.beans.Role;
-import com.talch.beans.User;
-import com.talch.exeption.ExistEx;
+import com.talch.beans.*;
 import com.talch.repo.CouponRepository;
 import com.talch.repo.UserRepository;
-
+import com.talch.utils.Utils;
 import lombok.Data;
+import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+import java.sql.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 @Data
 @Scope("prototype")
 public class CustomerFacade implements Facade {
-	@Autowired
-	UserRepository userRepository;
 
-	@Autowired
-	CouponRepository couponRepository;
-	
-	@Autowired
-	IncomeService incomeService;
-	
-	private long id;
-	private String custName;
-	private Role role = Role.Customer;
-	
-	public void addCoupons(long userId, List<Coupon> coupons) {
-		
-		User userToUpdate = userRepository.getOne(userId);
-		userToUpdate.setCupons(coupons);
-	
-		userRepository.save(userToUpdate);
-		
+    private final UserRepository userRepository;
 
-	}
-	public void addCouponToUser(long userId, long coupId) throws ExistEx {
-		Coupon coupon = couponRepository.getOne(coupId);
-		User userToUpdate = userRepository.getOne(userId);
-		
-		List<Coupon> coupons = (List<Coupon>) userToUpdate.getCupons();
-		if (coupons.contains(coupon)) {
-			throw new ExistEx("You have this coupon");
-		}
-		coupons.add(coupon);
-		
-		Income income = new Income();
-		income.setName(userToUpdate.getUserName());
-		income.setDate(new java.util.Date(System.currentTimeMillis()));
-		income.setDescription(Description.Bay_Coupon_By_User);
-		income.setAmount(coupon.getPrice());
-		income.setRole(userToUpdate.getRole());
-		income.setUserId(userId);
-		
-		double amountTmp = userToUpdate.getAmount();
-		userToUpdate.setAmount(amountTmp-coupon.getPrice());
-		
-		incomeService.storeIncome(income);
-		userRepository.save(userToUpdate);
+    private final CouponRepository couponRepository;
 
-	}
-	
-	public Collection<Coupon> getAllcouponsByUserId(long id) {
-		Optional<User> user = userRepository.findById(id);
-		List<Coupon> coupons = (List<Coupon>) user.get().getCupons();
-		return coupons;
+    private final IncomeService incomeService;
 
-	}
-	public Optional<User> getUserById(Long id) {
-		return userRepository.findById(id);
-	}
-	
+    private final Utils utils;
 
-	public Coupon getCouponByUserId(long custId, long coupId) throws ExistEx {
-		Optional<User> user = userRepository.findById(custId);
-		Coupon userCoupon = new Coupon();
-		List<Coupon> coupons = (List<Coupon>) user.get().getCupons();
-		for (Coupon coupon : coupons) {
-			if (coupon.getId() == coupId) {
-				userCoupon = coupon;
-			} else {
-				throw new ExistEx("This coupon not exist");
-			}
-		}
-		return userCoupon;
+    private long id;
+    private String custName;
+    private Role role = Role.Customer;
 
-	}
-	public List<Coupon> getUserCouponByPriceLessThat(long userId, double price) {
-		Optional<User> user = userRepository.findById(userId);
-		List<Coupon> userCoupons = new ArrayList<Coupon>();
-		List<Coupon> coupons = (List<Coupon>) user.get().getCupons();
-		for (Coupon coupon : coupons) {
-			if (coupon.getPrice() < price) {
-				userCoupons.add(coupon);
-			}
-		}
-		return userCoupons;
-	}
+    public ResponseEntity addCouponToUser(String token, long coupId) {
+        if (utils.checkRole(utils.isActive(token), Role.Customer)) {
+            Optional<Coupon> coupon = couponRepository.findById(coupId);
+            Optional<User> customer = userRepository.findById(utils.isActive(token).getFacade().getId());
+            List<Coupon> coupons = (List<Coupon>) customer.get().getCupons();
+            if (coupons.contains(coupon.get())) {
+                return utils.getResponseEntitySomesingWrong();
+            }
+            coupons.add(coupon.get());
+            Income income = new Income();
+            income.setName(customer.get().getUserName());
+            income.setDate(new java.util.Date(System.currentTimeMillis()));
+            income.setDescription(Description.Bay_Coupon_By_User);
+            income.setAmount(coupon.get().getPrice());
+            income.setRole(customer.get().getRole());
+            income.setUserId(customer.get().getId());
 
-	public List<Coupon> getUserCouponByType(long userId, CouponType type) {
-		Optional<User> user = userRepository.findById(userId);
-		List<Coupon> coupons = (List<Coupon>) user.get().getCupons();
-		for (Coupon coupon : coupons) {
-			if (coupon.getType() != type) {
-				coupons.remove(coupon);
-			}
-		}
-		return coupons;
-	}
+            double amountTmp = customer.get().getAmount();
+            customer.get().setAmount(amountTmp - coupon.get().getPrice());
 
-	public List<Coupon> getUserCouponByDateBefore(long userId, Date date) {
-		Optional<User> user = userRepository.findById(userId);
-		List<Coupon> userCoupons = new ArrayList<Coupon>();
-		List<Coupon> coupons = (List<Coupon>) user.get().getCupons();
-		for (Coupon coupon : coupons) {
-			if (coupon.getEndDate().before(date)) {
-				userCoupons.add(coupon);
-			}
-		}
-		return userCoupons;
-	}
-	
-	public List<Coupon> getAllCouponsOfAllCompanys() {
-		return couponRepository.findAll();
-	}
+            incomeService.storeIncome(income);
+            userRepository.save(customer.get());
 
+        }
+        return utils.getResponseEntitySesionNull();
+    }
+
+    public ResponseEntity getAllcouponsByUserId(String token) {
+        if (utils.checkRole(utils.isActive(token), Role.Customer)) {
+            Optional<User> user = userRepository.findById(utils.isActive(token).getFacade().getId());
+            ResponseEntity.status(HttpStatus.OK).body(user.get().getCupons());
+        }
+        return utils.getResponseEntitySesionNull();
+    }
+
+    public ResponseEntity getCouponByUserId(String token, long coupId) {
+        if (utils.checkRole(utils.isActive(token), Role.Customer)) {
+            Optional<User> user = userRepository.findById(utils.isActive(token).getFacade().getId());
+            Optional<Coupon> coupon = couponRepository.findById(coupId);
+            if (user.get().getCupons().contains(coupon.get())) ;
+            {
+                return ResponseEntity.status(HttpStatus.OK).body(coupon.get());
+            }
+        }
+        return utils.getResponseEntitySomesingWrong();
+    }
+
+    public ResponseEntity getUserCouponByPriceLessThat(String token, double price) {
+        if (utils.checkRole(utils.isActive(token), Role.Customer)) {
+            Optional<User> user = userRepository.findById(utils.isActive(token).getFacade().getId());
+            List<Coupon> sorted = user.get().getCupons().stream()
+                    .filter(coupon -> coupon.getPrice() < price)
+                    .collect(Collectors.toList());
+            return ResponseEntity.status(HttpStatus.OK).body(sorted);
+        }
+        return utils.getResponseEntitySesionNull();
+    }
+
+    public ResponseEntity getUserCouponByType(String token, CouponType type) {
+        if (utils.checkRole(utils.isActive(token), Role.Customer)) {
+            Optional<User> user = userRepository.findById(utils.isActive(token).getFacade().getId());
+            List<Coupon> sorted = user.get().getCupons().stream()
+                    .filter(coupon -> coupon.getType().equals(type))
+                    .collect(Collectors.toList());
+            return ResponseEntity.status(HttpStatus.OK).body(sorted);
+        }
+        return utils.getResponseEntitySesionNull();
+    }
+
+    public ResponseEntity getUserCouponByDateBefore(String token, Date date) {
+        if (utils.checkRole(utils.isActive(token), Role.Customer)) {
+            Optional<User> user = userRepository.findById(utils.isActive(token).getFacade().getId());
+            List<Coupon> sorted = user.get().getCupons().stream()
+                    .filter(coupon -> coupon.getEndDate().before(date))
+                    .collect(Collectors.toList());
+            return ResponseEntity.status(HttpStatus.OK).body(sorted);
+        }
+        return utils.getResponseEntitySesionNull();
+    }
+
+    public ResponseEntity getAllCouponsOfAllCompanys(String token) {
+        if (utils.checkRole(utils.isActive(token), Role.Customer)) {
+            return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findAll());
+        }
+        return utils.getResponseEntitySesionNull();
+    }
 }
