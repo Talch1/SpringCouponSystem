@@ -11,15 +11,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Data
 @Service
 @RequiredArgsConstructor
-@AllArgsConstructor
 public class Utils {
 
-    private final CouponSystem system;
-
     private final UserRepository userRepository;
+    private final Map<String, CustomSession> tokensMap;
 
     private final ResponseEntity<String> responseEntitySesionNull = ResponseEntity.
             status(HttpStatus.BAD_REQUEST).body("Session is null");
@@ -27,7 +27,7 @@ public class Utils {
             .body("Somesing Wrong");
 
     public CustomSession isActive(String token) {
-        CustomSession customSession = system.getTokensMap().get(token);
+        CustomSession customSession = tokensMap.get(token);
         if (customSession != null) {
             customSession.setLastAccessed(System.currentTimeMillis());
             return customSession;

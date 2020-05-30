@@ -24,7 +24,7 @@ public class CustomerController {
     // http://localhost:8081/v1/admin/logout
     @PostMapping(value = "/logout")
     private void logout(@RequestHeader String token) {
-        utils.getSystem().getTokensMap().remove(token);
+        utils.getTokensMap().remove(token);
     }
 
     // http://localhost:8081/v1/customer/seeAllCoupons

@@ -31,8 +31,6 @@ public class CouponSystem {
 
     private final UserRepository userRepository;
 
-    private final Map<String, CustomSession> tokensMap;
-
     @PostConstruct
     public void start() {
         dayli.start();

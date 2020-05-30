@@ -29,13 +29,13 @@ public class IncomeService {
     }
 
     public ResponseEntity viewAllIncome(String token) {
-        if (utils.checkRole(utils.getSystem().getTokensMap().get(token),Role.Admin)){
+        if (utils.checkRole(utils.getTokensMap().get(token),Role.Admin)){
             return ResponseEntity.status(HttpStatus.OK).body(incomeRepository.findAll());
         }else return utils.getResponseEntitySesionNull();
     }
 
     public ResponseEntity vievIncomeByCustomer(String token, long custId) {
-        if (utils.checkRole(utils.getSystem().getTokensMap().get(token),Role.Admin)){
+        if (utils.checkRole(utils.getTokensMap().get(token),Role.Admin)){
             List<Income> custIncomes = incomeRepository.findAll().stream()
                     .filter(income -> (((income.getRole().equals(Role.Customer)) && (income.getId() == custId))))
                     .collect(Collectors.toList());
@@ -44,9 +44,10 @@ public class IncomeService {
     }
 
     public ResponseEntity vievIncomeByCompany(String token) {
-        if (utils.checkRole(utils.getSystem().getTokensMap().get(token), Role.Company)) {
+        if (utils.checkRole(utils.getTokensMap().get(token), Role.Company)) {
             List<Income> compIncomes = incomeRepository.findAll().stream()
-                    .filter(income -> ((income.getRole().equals(Role.Company)) && (income.getUserId() == utils.getSystem().getTokensMap().get(token).getFacade().getId())))
+                    .filter(income -> ((income.getRole().equals(Role.Company)) &&
+                            (income.getUserId() == utils.getTokensMap().get(token).getFacade().getId())))
                     .collect(Collectors.toList());
             return ResponseEntity.status(HttpStatus.OK).body(compIncomes);
         } else return utils.getResponseEntitySesionNull();

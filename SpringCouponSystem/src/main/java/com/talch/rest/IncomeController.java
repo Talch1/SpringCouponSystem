@@ -3,6 +3,7 @@ package com.talch.rest;
 import com.talch.CouponSystem;
 import com.talch.beans.Income;
 import com.talch.service.IncomeService;
+import com.talch.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,10 +15,10 @@ public class IncomeController {
 
     private final IncomeService incomeService;
 
-    private final CouponSystem system;
+    private final Utils utils;
 
     private CustomSession isActive(String token) {
-        return system.getTokensMap().get(token);
+        return utils.getTokensMap().get(token);
     }
 
     //http://localhost:8081/v1/income/store
