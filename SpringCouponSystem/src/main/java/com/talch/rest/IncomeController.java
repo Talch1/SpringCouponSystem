@@ -5,7 +5,7 @@ import com.talch.beans.Income;
 import com.talch.beans.Role;
 import com.talch.facade.AdminFacade;
 import com.talch.facade.CompanyFacade;
-import com.talch.facade.IncomeService;
+import com.talch.service.IncomeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
