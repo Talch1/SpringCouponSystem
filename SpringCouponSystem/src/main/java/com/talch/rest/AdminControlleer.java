@@ -116,8 +116,8 @@ public class AdminControlleer {
     }
 
     // http://localhost:8081/v1/admin/addCouponToComp
-    @PutMapping(value = "/addCouponToComp/{userId}")
-    public ResponseEntity<?> addCouponsToComp(@PathVariable long userId, @RequestBody long couponId,
+    @PutMapping(value = "/addCouponToComp/{userId}/{couponId}")
+    public ResponseEntity<?> addCouponsToComp(@PathVariable long userId, @PathVariable long couponId,
                                               @RequestHeader String token) {
         return adminService.addCouponToUser(userId, couponId, token);
     }

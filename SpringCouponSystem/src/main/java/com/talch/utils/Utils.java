@@ -36,7 +36,7 @@ public class Utils {
     }
 
     public boolean checkRole(CustomSession session, Role role) {
-        if ((session != null) && (session.getFacade().getRole().equals(role))) {
+        if ((session != null) && (!session.getFacade().getRole().equals(role))) {
             return true;
         }
         return false;

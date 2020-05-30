@@ -62,13 +62,17 @@ public class AdminFacade implements Facade {
 
         List<Coupon> coup = new ArrayList<>();
 
-        coup.add(new Coupon(1582, "1+1", date, datePlus5Days, 5, coupType, "just now!", 50,
+        coup.add(new Coupon(
+                1582, "1+1", date, datePlus5Days, 5, coupType, "just now!", 50,
                 "https://www.searchpng.com/wp-content/uploads/2019/09/Sale-PNG.jpg"));
-        coup.add(new Coupon(152, "3+1", dateMinusFiveDyes, dateMinusDayDate, 5, coupType, "wow!", 50,
+        coup.add(new Coupon(
+                152, "3+1", dateMinusFiveDyes, dateMinusDayDate, 5, coupType, "wow!", 50,
                 "https://www.searchpng.com/wp-content/uploads/2019/09/Sale-PNG.jpg"));
-        coup.add(new Coupon(12, "2+1", date, datePlus5Days, 5, coupType2, "just today!", 82,
+        coup.add(new Coupon(
+                12, "2+1", date, datePlus5Days, 5, coupType2, "just today!", 82,
                 "https://www.searchpng.com/wp-content/uploads/2019/09/Sale-PNG.jpg"));
-        coup.add(new Coupon(82, "second helf price", date, datePlus1Min, 5, coupType3, "Sale!", 25,
+        coup.add(new Coupon(
+                82, "second helf price", date, datePlus1Min, 5, coupType3, "Sale!", 25,
                 "https://www.searchpng.com/wp-content/uploads/2019/09/Sale-PNG.jpg"));
 
         couponRepository.saveAll(coup);
@@ -188,13 +192,15 @@ public class AdminFacade implements Facade {
 
         Optional<Coupon> coupon = couponRepository.findById(coupId);
         Optional<User> userToUpdate = userRepository.findById(userId);
-        if (coupon.isPresent() && userToUpdate.isPresent() &&
-                ((utils.checkRole(utils.isActive(token), Role.Admin)))) {
-            List<Coupon> coupons = (List<Coupon>) userToUpdate.get().getCupons();
-            coupons.add(coupon.get());
-            return ResponseEntity.status(HttpStatus.OK).body(coupons);
+        Collection <Coupon> userCoupon = userToUpdate.get().getCupons();
+
+        if (utils.checkRole(utils.isActive(token), Role.Admin)||userCoupon.contains(coupon.get())){
+            return utils.getResponseEntitySomesingWrong();
         }
-        return utils.getResponseEntitySomesingWrong();
+        List<Coupon> coupons = (List<Coupon>) userToUpdate.get().getCupons();
+        coupons.add(coupon.get());
+        System.out.println(utils.checkRole(utils.isActive(token), Role.Admin));
+        return ResponseEntity.status(HttpStatus.OK).body(coupons);
     }
 
     // **************************CouponS************************************

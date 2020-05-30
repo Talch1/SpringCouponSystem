@@ -25,8 +25,7 @@ public class DailyCouponExpirationTask extends Thread {
         List<Coupon> coupons = couponRepository.findAll();
         coupons.stream().filter(coupon -> coupon.getEndDate().
                 before(new Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24))).
-                collect(Collectors.toList());
-        couponRepository.deleteAll(coupons);
+                forEach(couponRepository::delete);
         System.out.println("all Coupon before date " + new Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24) + " was deleted");
         try {
             Thread.sleep(1000 * 24 * 60 * 60);
