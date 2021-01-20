@@ -1,10 +1,8 @@
 package com.talch.utils;
 
-import com.talch.CouponSystem;
 import com.talch.beans.Role;
 import com.talch.repo.UserRepository;
 import com.talch.rest.CustomSession;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,7 +34,7 @@ public class Utils {
     }
 
     public boolean checkRole(CustomSession session, Role role) {
-        if ((session != null) && (!session.getFacade().getRole().equals(role))) {
+        if ((session != null) && (session.getFacade().getRole().equals(role))) {
             return true;
         }
         return false;

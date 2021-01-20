@@ -32,6 +32,7 @@ public class LogginService {
             session.setFacade(facade);
             session.setLastAccessed(lastAccessed);
             utils.getTokensMap().put(token, session);
+
             return ResponseEntity.status(HttpStatus.OK).body(token);
         }
         return utils.getResponseEntitySesionNull();

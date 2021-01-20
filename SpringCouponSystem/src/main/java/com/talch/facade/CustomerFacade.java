@@ -64,8 +64,9 @@ public class CustomerFacade implements Facade {
 
     public ResponseEntity getAllcouponsByUserId(String token) {
         if (utils.checkRole(utils.isActive(token), Role.Customer)) {
+
             Optional<User> user = userRepository.findById(utils.isActive(token).getFacade().getId());
-            ResponseEntity.status(HttpStatus.OK).body(user.get().getCupons());
+            return   ResponseEntity.status(HttpStatus.OK).body(user.get().getCupons());
         }
         return utils.getResponseEntitySesionNull();
     }
