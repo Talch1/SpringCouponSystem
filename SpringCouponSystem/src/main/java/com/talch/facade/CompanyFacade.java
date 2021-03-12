@@ -8,6 +8,7 @@ import com.talch.service.IncomeService;
 import com.talch.utils.Utils;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -30,11 +31,13 @@ public class CompanyFacade implements Facade {
 
     private final Utils utils;
 
+    private final ApplicationContext context;
+
     private long id;
     private String name;
     private Role role = Role.Company;
 
-    public ResponseEntity addCouponToUser(long coupId, String token) {
+    public ResponseEntity<?> addCouponToUser(long coupId, String token) {
         Optional<Coupon> coupon = couponRepository.findById(coupId);
         Optional<User> userToUpdate = userRepository.findById(utils.isActive(token).getFacade().getId());
         if (utils.checkRole(utils.isActive(token), Role.Company) &&
@@ -46,7 +49,7 @@ public class CompanyFacade implements Facade {
         return utils.getResponseEntitySomesingWrong();
     }
 
-    public ResponseEntity addCoupon(Coupon coupon, String token) {
+    public ResponseEntity<?> addCoupon(Coupon coupon, String token) {
 
         if (utils.checkRole(utils.isActive(token), Role.Company)) {
 
@@ -54,8 +57,9 @@ public class CompanyFacade implements Facade {
                 return utils.getResponseEntitySomesingWrong();
             } else {
                 couponRepository.save(coupon);
-                Income income = new Income();
+                Income income = context.getBean(Income.class);
                 Optional<User> userToUpdate = userRepository.findById(utils.isActive(token).getFacade().getId());
+                if (userToUpdate.isPresent()){
                 income.setName(userToUpdate.get().getUserName());
                 income.setDate(new java.util.Date(System.currentTimeMillis()));
                 income.setDescription(Description.Company_Add_Coupon);
@@ -69,13 +73,13 @@ public class CompanyFacade implements Facade {
                 coupons.add(coupon);
                 userToUpdate.get().setCupons(coupons);
                 userRepository.save(userToUpdate.get());
-                return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findAll());
+                return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findAll());}
             }
         }
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity findAllCouponsByUser(String token) {
+    public ResponseEntity<?> findAllCouponsByUser(String token) {
         if (utils.checkRole(utils.isActive(token), Role.Company)) {
             return ResponseEntity.status(HttpStatus.OK).body(
                     userRepository.findById(utils.isActive(token).getFacade().getId()).get().getCupons());
@@ -83,7 +87,7 @@ public class CompanyFacade implements Facade {
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity deleteCouponByUser(String token, long coupId) {
+    public ResponseEntity<?> deleteCouponByUser(String token, long coupId) {
         if (utils.checkRole(utils.isActive(token), Role.Company)) {
             Optional<User> user = userRepository.findById(utils.isActive(token).getFacade().getId());
             List<Coupon> list = user.get().getCupons().stream().filter(coupon ->
@@ -97,7 +101,7 @@ public class CompanyFacade implements Facade {
     }
 
 
-    public ResponseEntity deleteCouponsByUser(String token) {
+    public ResponseEntity<?> deleteCouponsByUser(String token) {
         if (utils.checkRole(utils.isActive(token), Role.Company)) {
             Optional<User> user = userRepository.findById(utils.isActive(token).getFacade().getId());
             user.get().setCupons(null);
@@ -107,7 +111,7 @@ public class CompanyFacade implements Facade {
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity updateCoupon(Coupon coupon, String token) {
+    public ResponseEntity<?> updateCoupon(Coupon coupon, String token) {
         if (utils.checkRole(utils.isActive(token), Role.Company)) {
             Optional<User> company = userRepository.findById(utils.isActive(token).getFacade().getId());
             Coupon compCoupon = company.get().getCupons().stream()
@@ -119,7 +123,7 @@ public class CompanyFacade implements Facade {
                 coupToUpdate.get().setEndDate(coupon.getEndDate());
                 coupToUpdate.get().setPrice(coupon.getPrice());
 
-                Income income = new Income();
+                Income income = context.getBean(Income.class);
                 income.setName(company.get().getUserName());
                 income.setDate(new java.util.Date(System.currentTimeMillis()));
                 income.setDescription(Description.Company_update_Coupon);
@@ -142,21 +146,23 @@ public class CompanyFacade implements Facade {
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity getUserCouponByType(String token, String type) {
+    public ResponseEntity<?> getUserCouponByType(String token, String type) {
         if (utils.checkRole(utils.isActive(token), Role.Company)) {
             Optional<User> user = userRepository.findById(utils.isActive(token).getFacade().getId());
-            List sorted = user.get().getCupons().stream().
-                    filter(coupon -> (coupon.getType().toString()).equals(type)).
-                    collect(Collectors.toList());
-            return ResponseEntity.status(HttpStatus.OK).body(sorted);
+            if (user.isPresent()) {
+                List<Coupon> sorted = user.get().getCupons().stream().
+                        filter(coupon -> (coupon.getType().toString()).equals(type)).
+                        collect(Collectors.toList());
+                return ResponseEntity.status(HttpStatus.OK).body(sorted);
+            }
         }
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity getUserCouponByDateBefore(String token, Date date) {
+    public ResponseEntity<?> getUserCouponByDateBefore(String token, Date date) {
         if (utils.checkRole(utils.isActive(token), Role.Company)) {
             Optional<User> user = userRepository.findById(utils.isActive(token).getFacade().getId());
-            List sorted = user.get().getCupons().stream().
+            List<Coupon> sorted = user.get().getCupons().stream().
                     filter(coupon -> (coupon.getEndDate().before(date))).
                     collect(Collectors.toList());
             return ResponseEntity.status(HttpStatus.OK).body(sorted);
@@ -164,10 +170,10 @@ public class CompanyFacade implements Facade {
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity getUserCouponByPriceLessThat(String token, double price) {
+    public ResponseEntity<?> getUserCouponByPriceLessThat(String token, double price) {
         if (utils.checkRole(utils.isActive(token), Role.Company)) {
             Optional<User> user = userRepository.findById(utils.isActive(token).getFacade().getId());
-            List sorted = user.get().getCupons().stream().
+            List<Coupon> sorted = user.get().getCupons().stream().
                     filter(coupon -> (coupon.getPrice() < price)).
                     collect(Collectors.toList());
             return ResponseEntity.status(HttpStatus.OK).body(sorted);
@@ -175,7 +181,7 @@ public class CompanyFacade implements Facade {
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity findCoupfromUserbyCouponId(String token, long coupId) {
+    public ResponseEntity<?> findCoupfromUserbyCouponId(String token, long coupId) {
         Optional<User> comp = userRepository.findById(utils.isActive(token).getFacade().getId());
         if (utils.checkRole(utils.isActive(token), Role.Company) && comp.isPresent()) {
             Collection<Coupon> coupons = comp.get().getCupons();
@@ -187,11 +193,11 @@ public class CompanyFacade implements Facade {
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity viewIncomes(String token) {
+    public ResponseEntity<?> viewIncomes(String token) {
         return incomeService.vievIncomeByCompany(token);
     }
 
-    public ResponseEntity getAllCouponsOfAllCompanys(String token) {
+    public ResponseEntity<?> getAllCouponsOfAllCompanys(String token) {
 
         if (utils.checkRole(utils.isActive(token), Role.Company)) {
             return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findAll());

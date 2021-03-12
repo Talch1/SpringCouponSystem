@@ -13,6 +13,7 @@ import java.sql.Date;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/customer")
+@CrossOrigin("*")
 public class CustomerController {
 
     private final CustomerFacade customerService;
@@ -29,7 +30,7 @@ public class CustomerController {
 
     // http://localhost:8081/v1/customer/seeAllCoupons
     @GetMapping(value = "/seeAllCoupons")
-    public ResponseEntity seeAllCoup(@RequestHeader String token) {
+    public ResponseEntity<?> seeAllCoup(@RequestHeader String token) {
         return customerService.getAllCouponsOfAllCompanys(token);
     }
 

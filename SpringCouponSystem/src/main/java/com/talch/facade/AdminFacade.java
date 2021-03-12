@@ -45,9 +45,8 @@ public class AdminFacade implements Facade {
     private final Utils utils;
 
 
-
     // **************************user************************************
-    public ResponseEntity insertUser(User user, String token) {
+    public ResponseEntity<?> insertUser(User user, String token) {
         if (utils.checkRole(utils.isActive(token), Role.Admin)) {
             List<User> users = userRepository.findAll();
             if (user.getRole().equals(Role.Customer)) {
@@ -69,7 +68,7 @@ public class AdminFacade implements Facade {
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity deleteUserById(long userId, String token) {
+    public ResponseEntity<?> deleteUserById(long userId, String token) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isPresent() && utils.checkRole(utils.isActive(token), Role.Admin)) {
             userRepository.deleteById(userId);
@@ -93,7 +92,7 @@ public class AdminFacade implements Facade {
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity getUserById(long id, String token) {
+    public ResponseEntity<?> getUserById(long id, String token) {
         Optional<User> user = userRepository.findById(id);
         if (utils.checkRole(utils.isActive(token), Role.Admin) && (user.isPresent())) {
             return ResponseEntity.status(HttpStatus.OK).body(user);
@@ -101,7 +100,7 @@ public class AdminFacade implements Facade {
         return utils.getResponseEntitySomesingWrong();
     }
 
-    public ResponseEntity findAllCust(String token) {
+    public ResponseEntity<?> findAllCust(String token) {
 
         if (utils.checkRole(utils.isActive(token), Role.Admin)) {
             return ResponseEntity.status(HttpStatus.OK)
@@ -112,7 +111,7 @@ public class AdminFacade implements Facade {
         return utils.getResponseEntitySomesingWrong();
     }
 
-    public ResponseEntity findAllComp(String token) {
+    public ResponseEntity<?> findAllComp(String token) {
 
         if (utils.checkRole(utils.isActive(token), Role.Admin)) {
             return ResponseEntity.status(HttpStatus.OK)
@@ -136,7 +135,7 @@ public class AdminFacade implements Facade {
         return utils.getResponseEntitySomesingWrong();
     }
 
-    public ResponseEntity getUserByNameAndPass(String name, String pass, Role role, String token) {
+    public ResponseEntity<?> getUserByNameAndPass(String name, String pass, Role role, String token) {
 
         Optional<User> user = userRepository.findByUserNameAndPassword(name, pass);
         if (utils.checkRole(utils.isActive(token), Role.Admin) && (user.get().getRole().equals(role))) {
@@ -145,7 +144,7 @@ public class AdminFacade implements Facade {
         return utils.getResponseEntitySomesingWrong();
     }
 
-    public ResponseEntity addCouponToUser(long userId, long coupId, String token) {
+    public ResponseEntity<?> addCouponToUser(long userId, long coupId, String token) {
 
         Optional<Coupon> coupon = couponRepository.findById(coupId);
         Optional<User> userToUpdate = userRepository.findById(userId);
@@ -162,7 +161,7 @@ public class AdminFacade implements Facade {
 
     // **************************CouponS************************************
 
-    public ResponseEntity addCoupon(Coupon coupon, String token) {
+    public ResponseEntity<?> addCoupon(Coupon coupon, String token) {
 
         if ((!userRepository.findById(coupon.getId()).isPresent()) &&
                 (utils.checkRole(utils.isActive(token), Role.Admin))) {
@@ -172,7 +171,7 @@ public class AdminFacade implements Facade {
         return utils.getResponseEntitySomesingWrong();
     }
 
-    public ResponseEntity getAllcouponsByUserId(long id, String token) {
+    public ResponseEntity<?> getAllcouponsByUserId(long id, String token) {
 
         if (utils.checkRole(utils.isActive(token), Role.Admin)) {
             Collection<Coupon> coupons = userRepository.findById(id).get().getCupons();
@@ -181,7 +180,7 @@ public class AdminFacade implements Facade {
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity deleteCoupon(long coupId, String token) {
+    public ResponseEntity<?> deleteCoupon(long coupId, String token) {
 
         if (utils.checkRole(utils.isActive(token), Role.Admin)) {
             couponRepository.deleteById(coupId);
@@ -190,7 +189,7 @@ public class AdminFacade implements Facade {
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity updateCouponAdmin(Coupon coupon, String token) {
+    public ResponseEntity<?> updateCouponAdmin(Coupon coupon, String token) {
 
         Optional<Coupon> coupToUpdate = couponRepository.findById(coupon.getId());
         if (coupToUpdate.isPresent() && utils.checkRole(utils.isActive(token), Role.Admin)) {
@@ -211,7 +210,7 @@ public class AdminFacade implements Facade {
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity findCoupById(long id, String token) {
+    public ResponseEntity<?> findCoupById(long id, String token) {
 
         Optional<Coupon> coupon = couponRepository.findById(id);
         if (coupon.isPresent() && (utils.checkRole(utils.isActive(token), Role.Admin))) {
@@ -220,7 +219,7 @@ public class AdminFacade implements Facade {
         return utils.getResponseEntitySomesingWrong();
     }
 
-    public ResponseEntity findAllCoup(String token) {
+    public ResponseEntity<?> findAllCoup(String token) {
 
         if (utils.checkRole(utils.isActive(token), Role.Admin)) {
             return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findAll());
@@ -228,7 +227,7 @@ public class AdminFacade implements Facade {
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity getCouponByType(CouponType type, String token) {
+    public ResponseEntity<?> getCouponByType(CouponType type, String token) {
 
         if (utils.checkRole(utils.isActive(token), Role.Admin)) {
             return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findByType(type));
@@ -236,14 +235,14 @@ public class AdminFacade implements Facade {
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity getCouponByDate(Date date, String token) {
+    public ResponseEntity<?> getCouponByDate(Date date, String token) {
         if (utils.checkRole(utils.isActive(token), Role.Admin)) {
             return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findByEndDateBefore(date));
         }
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity getCouponWhenPriceBetwenPrice(Double price1, String token) {
+    public ResponseEntity<?> getCouponWhenPriceBetwenPrice(Double price1, String token) {
         if (utils.checkRole(utils.isActive(token), Role.Admin)) {
             return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findByPriceLessThan(price1));
         }

@@ -16,6 +16,7 @@ import java.sql.Date;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/admin/")
+@CrossOrigin("*")
 public class AdminControlleer {
 
 
@@ -23,13 +24,13 @@ public class AdminControlleer {
 
     private final Utils utils;
 
-    // http://localhost:8081/v1/admin//logout
+    // http://localhost:8081/v1/admin/logout
     @PostMapping(value = "/logout")
     private void logout(@RequestHeader String token) {
         utils.getTokensMap().remove(token);
     }
 //******************************Customer**********************************
-
+    // http://localhost:8081/v1/admin/customerCreate
     // http://localhost:8081/v1/admin/customerCreate
     @PostMapping(value = "/customerCreate")
     public ResponseEntity<?> customerCreate(@RequestBody User customer, @RequestHeader String token) {

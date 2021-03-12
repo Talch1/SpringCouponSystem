@@ -6,6 +6,7 @@ import com.talch.repo.UserRepository;
 import com.talch.service.IncomeService;
 import com.talch.utils.Utils;
 import lombok.Data;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +32,13 @@ public class CustomerFacade implements Facade {
 
     private final Utils utils;
 
+    private final ApplicationContext context;
+
     private long id;
     private String custName;
     private Role role = Role.Customer;
 
-    public ResponseEntity addCouponToUser(String token, long coupId) {
+    public ResponseEntity<?> addCouponToUser(String token, long coupId) {
         if (utils.checkRole(utils.isActive(token), Role.Customer)) {
             Optional<Coupon> coupon = couponRepository.findById(coupId);
             Optional<User> customer = userRepository.findById(utils.isActive(token).getFacade().getId());
@@ -44,7 +47,7 @@ public class CustomerFacade implements Facade {
                 return utils.getResponseEntitySomesingWrong();
             }
             coupons.add(coupon.get());
-            Income income = new Income();
+            Income income = context.getBean(Income.class);
             income.setName(customer.get().getUserName());
             income.setDate(new java.util.Date(System.currentTimeMillis()));
             income.setDescription(Description.Bay_Coupon_By_User);
@@ -62,7 +65,7 @@ public class CustomerFacade implements Facade {
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity getAllcouponsByUserId(String token) {
+    public ResponseEntity<?> getAllcouponsByUserId(String token) {
         if (utils.checkRole(utils.isActive(token), Role.Customer)) {
 
             Optional<User> user = userRepository.findById(utils.isActive(token).getFacade().getId());
@@ -71,7 +74,7 @@ public class CustomerFacade implements Facade {
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity getCouponByUserId(String token, long coupId) {
+    public ResponseEntity<?> getCouponByUserId(String token, long coupId) {
         if (utils.checkRole(utils.isActive(token), Role.Customer)) {
             Optional<User> user = userRepository.findById(utils.isActive(token).getFacade().getId());
             Optional<Coupon> coupon = couponRepository.findById(coupId);
@@ -83,7 +86,7 @@ public class CustomerFacade implements Facade {
         return utils.getResponseEntitySomesingWrong();
     }
 
-    public ResponseEntity getUserCouponByPriceLessThat(String token, double price) {
+    public ResponseEntity<?> getUserCouponByPriceLessThat(String token, double price) {
         if (utils.checkRole(utils.isActive(token), Role.Customer)) {
             Optional<User> user = userRepository.findById(utils.isActive(token).getFacade().getId());
             List<Coupon> sorted = user.get().getCupons().stream()
@@ -94,7 +97,7 @@ public class CustomerFacade implements Facade {
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity getUserCouponByType(String token, CouponType type) {
+    public ResponseEntity<?> getUserCouponByType(String token, CouponType type) {
         if (utils.checkRole(utils.isActive(token), Role.Customer)) {
             Optional<User> user = userRepository.findById(utils.isActive(token).getFacade().getId());
             List<Coupon> sorted = user.get().getCupons().stream()
@@ -105,7 +108,7 @@ public class CustomerFacade implements Facade {
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity getUserCouponByDateBefore(String token, Date date) {
+    public ResponseEntity<?> getUserCouponByDateBefore(String token, Date date) {
         if (utils.checkRole(utils.isActive(token), Role.Customer)) {
             Optional<User> user = userRepository.findById(utils.isActive(token).getFacade().getId());
             List<Coupon> sorted = user.get().getCupons().stream()
@@ -116,7 +119,7 @@ public class CustomerFacade implements Facade {
         return utils.getResponseEntitySesionNull();
     }
 
-    public ResponseEntity getAllCouponsOfAllCompanys(String token) {
+    public ResponseEntity<?> getAllCouponsOfAllCompanys(String token) {
         if (utils.checkRole(utils.isActive(token), Role.Customer)) {
             return ResponseEntity.status(HttpStatus.OK).body(couponRepository.findAll());
         }

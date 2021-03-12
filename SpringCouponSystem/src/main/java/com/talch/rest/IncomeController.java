@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/income")
+@CrossOrigin("*")
 public class IncomeController {
 
     private final IncomeService incomeService;
