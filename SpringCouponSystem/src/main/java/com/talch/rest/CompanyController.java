@@ -2,6 +2,7 @@ package com.talch.rest;
 
 import java.sql.Date;
 
+import com.talch.service.CouponSystem;
 import com.talch.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.talch.CouponSystem;
 import com.talch.beans.Coupon;
 
 import com.talch.facade.CompanyFacade;

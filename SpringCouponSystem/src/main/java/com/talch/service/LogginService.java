@@ -1,6 +1,5 @@
 package com.talch.service;
 
-import com.talch.CouponSystem;
 import com.talch.beans.Role;
 import com.talch.facade.Facade;
 import com.talch.rest.CustomSession;

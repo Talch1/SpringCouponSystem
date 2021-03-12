@@ -21,7 +21,7 @@ public class DailyCouponExpirationTask extends Thread {
 
     @Override
     public void run() {
-
+        System.out.println("Daily coupon run");
         List<Coupon> coupons = couponRepository.findAll();
         coupons.stream().filter(coupon -> coupon.getEndDate().
                 before(new Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24))).

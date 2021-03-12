@@ -1,6 +1,5 @@
 package com.talch.rest;
 
-import com.talch.CouponSystem;
 import com.talch.beans.Income;
 import com.talch.service.IncomeService;
 import com.talch.utils.Utils;

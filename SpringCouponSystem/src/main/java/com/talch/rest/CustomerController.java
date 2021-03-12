@@ -1,8 +1,8 @@
 package com.talch.rest;
 
-import com.talch.CouponSystem;
 import com.talch.beans.CouponType;
 import com.talch.facade.CustomerFacade;
+import com.talch.service.CouponSystem;
 import com.talch.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
